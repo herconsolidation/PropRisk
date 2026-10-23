@@ -1,1413 +1,770 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prop Firm Risk & Consistency Calculator</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        slate: {
-                            850: '#111827',
-                            900: '#0f172a',
-                            950: '#020617',
-                        },
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                        }
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HerConsolidation Risk & Consistency Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            emerald: {
+              950: '#041f17',
+              900: '#062c21',
+              800: '#0b3c2d',
+              700: '#11523f',
+            },
+            gold: {
+              300: '#f3e5ab',
+              400: '#e6ca65',
+              500: '#d4af37',
+              600: '#b8860b',
+              700: '#8c6507',
             }
+          }
         }
-    </script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.2s ease, color 0.2s ease;
-        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    
+    .gold-gradient-text {
+      background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #b8860b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-        /* Light Theme Comprehensive Styling */
-        html:not(.dark) body {
-            background-color: #f8fafc;
-            color: #0f172a;
-        }
+    .gold-border-gradient {
+      border-image: linear-gradient(135deg, #d4af37, #8c6507) 1;
+    }
 
-        /* Headers & Navbars */
-        html:not(.dark) header {
-            background-color: rgba(255, 255, 255, 0.9) !important;
-            border-color: #e2e8f0 !important;
-        }
-        html:not(.dark) header h1 {
-            color: #0f172a !important;
-        }
-        html:not(.dark) footer {
-            background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
-            color: #64748b !important;
-        }
+    .emerald-glow {
+      box-shadow: 0 0 25px -5px rgba(13, 148, 136, 0.25);
+    }
 
-        /* Cards & Containers */
-        html:not(.dark) section,
-        html:not(.dark) .lg\:col-span-7 > div,
-        html:not(.dark) .lg\:col-span-6 > div,
-        html:not(.dark) .lg\:col-span-5 > div {
-            background-color: #ffffff !important;
-            border-color: #e2e8f0 !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
-        }
-
-        /* Inner Sub-cards & Containers */
-        html:not(.dark) .bg-slate-950,
-        html:not(.dark) .bg-slate-950\/80,
-        html:not(.dark) .bg-slate-950\/60 {
-            background-color: #f1f5f9 !important;
-            border-color: #cbd5e1 !important;
-        }
-
-        /* Typography Override for Light Mode */
-        html:not(.dark) h2,
-        html:not(.dark) h3,
-        html:not(.dark) h4 {
-            color: #0f172a !important;
-        }
-        html:not(.dark) label,
-        html:not(.dark) .text-slate-300,
-        html:not(.dark) .text-slate-200 {
-            color: #334155 !important;
-        }
-        html:not(.dark) .text-slate-400 {
-            color: #64748b !important;
-        }
-        html:not(.dark) .text-slate-500 {
-            color: #64748b !important;
-        }
-        html:not(.dark) .text-white {
-            color: #0f172a !important;
-        }
-
-        /* Header Quick Rule Chips in Light Mode */
-        html:not(.dark) header .bg-slate-800 {
-            background-color: #f1f5f9 !important;
-            border-color: #cbd5e1 !important;
-            color: #334155 !important;
-        }
-        html:not(.dark) header .text-white {
-            color: #0f172a !important;
-        }
-
-        /* Theme Toggle Button */
-        html:not(.dark) #themeBtn {
-            background-color: #ffffff !important;
-            border-color: #cbd5e1 !important;
-            color: #334155 !important;
-        }
-
-        /* Inputs, Selects & Buttons */
-        html:not(.dark) input[type="number"],
-        html:not(.dark) input[type="text"],
-        html:not(.dark) select {
-            background-color: #ffffff !important;
-            border-color: #cbd5e1 !important;
-            color: #0f172a !important;
-        }
-        html:not(.dark) input[type="number"]:focus,
-        html:not(.dark) select:focus {
-            border-color: #2563eb !important;
-            background-color: #ffffff !important;
-        }
-
-        /* Preset Quick Buttons */
-        html:not(.dark) button.bg-slate-800 {
-            background-color: #e2e8f0 !important;
-            border-color: #cbd5e1 !important;
-            color: #334155 !important;
-        }
-        html:not(.dark) button.bg-slate-800:hover {
-            background-color: #cbd5e1 !important;
-        }
-
-        /* Tables */
-        html:not(.dark) table thead {
-            background-color: #e2e8f0 !important;
-            border-color: #cbd5e1 !important;
-            color: #475569 !important;
-        }
-        html:not(.dark) table tbody {
-            background-color: #ffffff !important;
-        }
-        html:not(.dark) table tbody tr {
-            border-color: #e2e8f0 !important;
-        }
-        html:not(.dark) table tbody tr:hover {
-            background-color: #f8fafc !important;
-        }
-        html:not(.dark) td {
-            color: #334155 !important;
-        }
-
-        /* Progress Bar Trackers */
-        html:not(.dark) .bg-slate-800 {
-            background-color: #cbd5e1 !important;
-        }
-
-        /* Rule Formula Blocks in Explainer */
-        html:not(.dark) .bg-slate-900 {
-            background-color: #e2e8f0 !important;
-            color: #334155 !important;
-        }
-
-        /* Status & Alert Box Adjustments */
-        html:not(.dark) #payoutCorrectionDetails {
-            background-color: #ffffff !important;
-            border-color: #cbd5e1 !important;
-        }
-        html:not(.dark) #sequenceStatusBanner.bg-slate-950 {
-            background-color: #f1f5f9 !important;
-            border-color: #cbd5e1 !important;
-            color: #475569 !important;
-        }
-
-        /* Custom scrollbar for log table */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        html:not(.dark) ::-webkit-scrollbar-track {
-            background: #f1f5f9;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        html:not(.dark) ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-    </style>
+    .gold-glow {
+      box-shadow: 0 0 20px -3px rgba(212, 175, 55, 0.25);
+    }
+  </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased">
+<body class="bg-[#041f17] dark:bg-[#041f17] text-slate-100 min-h-screen transition-colors duration-300 flex flex-col justify-between">
 
-    <!-- Header / Navbar -->
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="p-2 bg-brand-600/20 text-brand-500 rounded-lg border border-brand-500/30">
-                    <i data-lucide="calculator" class="w-6 h-6"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg font-bold text-white dark:text-white dark-toggle-text tracking-tight flex items-center gap-2">
-                        PropRisk <span class="text-xs px-2 py-0.5 rounded bg-brand-500/20 text-brand-400 font-semibold border border-brand-500/30">Consistency Lab</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Rules Engine & Payout Compliance Calculator</p>
-                </div>
-            </div>
-
-            <!-- Theme Toggle Button & Quick Rule Info Chips -->
-            <div class="flex items-center gap-3">
-                <!-- Dark / Light Theme Switch Button -->
-                <button onclick="toggleTheme()" id="themeBtn" class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium transition shadow-sm">
-                    <i data-lucide="sun" id="themeIcon" class="w-4 h-4 text-amber-400"></i>
-                    <span id="themeLabel">Light Mode</span>
-                </button>
-
-                <div class="hidden sm:flex items-center gap-2 text-xs">
-                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-blue-400"></span> 1-Step: <strong class="text-white">35% Cap</strong>
-                    </span>
-                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-indigo-400"></span> 2-Step: <strong class="text-white">40% Cap</strong>
-                    </span>
-                    <span class="bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md text-slate-300 flex items-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Add-on: <strong class="text-white">50% Cap</strong>
-                    </span>
-                </div>
-            </div>
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-50 bg-[#062c21]/90 dark:bg-[#062c21]/90 backdrop-blur-md border-b border-gold-500/30 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <!-- Logo Branding -->
+      <div class="flex items-center space-x-3">
+        <div class="relative w-12 h-12 rounded-xl bg-gradient-to-br from-gold-400 via-gold-500 to-gold-700 p-[2px] shadow-lg flex items-center justify-center overflow-hidden">
+          <div class="w-full h-full bg-[#041f17] rounded-[10px] flex items-center justify-center p-1">
+            <!-- Brand Logo image or SVG Badge rendering provided logo concept -->
+            <img 
+              src="https://placehold.co/100x100/062c21/d4af37?text=BLOOM" 
+              onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23d4af37\'><circle cx=\'50\' cy=\'50\' r=\'40\' stroke=\'%23d4af37\' stroke-width=\'4\' fill=\'%23062c21\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-weight=\'bold\' font-size=\'20\' fill=\'%23f3e5ab\'>BF</text></svg>'" 
+              alt="HerConsolidation Logo" 
+              class="w-full h-full object-cover rounded-md" 
+            />
+          </div>
         </div>
-    </header>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight gold-gradient-text">HerConsolidation</h1>
+          <p class="text-xs text-gold-300/70 font-medium">Risk & Consistency Intelligence Hub</p>
+        </div>
+      </div>
 
-    <!-- Main Container -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      <!-- Navigation Tabs & Theme Switcher -->
+      <div class="flex items-center space-x-3">
+        <nav class="hidden md:flex space-x-1 bg-[#041f17]/80 p-1 rounded-xl border border-gold-500/20 text-xs font-semibold">
+          <button onclick="switchTab('consistency')" id="tab-btn-consistency" class="px-3 py-1.5 rounded-lg transition-all text-gold-300 bg-emerald-800/80 border border-gold-500/40">Consistency Engine</button>
+          <button onclick="switchTab('position')" id="tab-btn-position" class="px-3 py-1.5 rounded-lg transition-all text-slate-300 hover:text-gold-300">Risk Calculator</button>
+          <button onclick="switchTab('limits')" id="tab-btn-limits" class="px-3 py-1.5 rounded-lg transition-all text-slate-300 hover:text-gold-300">Account Rules</button>
+        </nav>
 
-        <!-- Top Configuration Bar -->
-        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
-            <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-4 flex items-center gap-2">
-                <i data-lucide="sliders" class="w-4 h-4 text-brand-500"></i> Account & Rule Setup
-            </h2>
+        <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl bg-[#08382b] border border-gold-500/30 text-gold-300 hover:bg-gold-500/10 transition-colors">
+          <i data-lucide="sun" id="themeIcon" class="w-5 h-5"></i>
+        </button>
+      </div>
+    </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                
-                <!-- Account Size Input -->
-                <div class="space-y-2">
-                    <label class="text-xs font-medium text-slate-300 flex justify-between">
-                        <span>Account Size ($)</span>
-                        <span id="accountSizeDisplay" class="text-brand-400 font-bold">$100,000</span>
-                    </label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">$</span>
-                        <input type="number" id="accountSizeInput" value="100000" step="5000" min="1000"
-                            class="w-full pl-8 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
-                    </div>
-                    <!-- Quick Presets -->
-                    <div class="flex flex-wrap gap-1.5 pt-1">
-                        <button onclick="setAccountSize(5000)" class="px-2 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">5k</button>
-                        <button onclick="setAccountSize(10000)" class="px-2 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">10k</button>
-                        <button onclick="setAccountSize(25000)" class="px-2 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">25k</button>
-                        <button onclick="setAccountSize(50000)" class="px-2 py-1 text-xs rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">50k</button>
-                        <button onclick="setAccountSize(100000)" class="px-2 py-1 text-xs rounded bg-slate-800 border border-brand-500/50 text-brand-400 font-medium transition">100k</button>
-                    </div>
-                </div>
+    <!-- Mobile Nav Bar -->
+    <div class="md:hidden flex justify-around mt-3 pt-2 border-t border-gold-500/20 text-xs">
+      <button onclick="switchTab('consistency')" id="mob-tab-consistency" class="text-gold-300 font-bold border-b-2 border-gold-400 pb-1">Consistency</button>
+      <button onclick="switchTab('position')" id="mob-tab-position" class="text-slate-400 pb-1">Risk Calc</button>
+      <button onclick="switchTab('limits')" id="mob-tab-limits" class="text-slate-400 pb-1">Rules</button>
+    </div>
+  </header>
 
-                <!-- Challenge Type & Phase Selection -->
-                <div class="space-y-2">
-                    <label class="text-xs font-medium text-slate-300">Challenge Mode / Phase</label>
-                    <select id="challengeTypeSelect" onchange="updateCalculator()"
-                        class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
-                        <option value="1step">1-Step Challenge (Target: 10%)</option>
-                        <option value="2step_p1">2-Step Challenge — Phase 1 (Target: 8%)</option>
-                        <option value="2step_p2">2-Step Challenge — Phase 2 (Target: 5%)</option>
-                        <option value="funded">Funded Phase / Payout Request</option>
-                    </select>
-                    <p id="challengeTypeDesc" class="text-[11px] text-slate-400 pt-0.5">
-                        Single evaluation phase with 10% target and 35% consistency limit.
-                    </p>
-                </div>
+  <!-- Main Content Body -->
+  <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
 
-                <!-- Rule Add-On Toggle -->
-                <div class="space-y-2">
-                    <label class="text-xs font-medium text-slate-300 flex items-center justify-between">
-                        <span>Consistency Add-On / Rule Removal</span>
-                        <span id="addonBadge" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">Standard</span>
-                    </label>
-                    <div class="p-2.5 bg-slate-950 border border-slate-700 rounded-lg flex items-center justify-between">
-                        <div class="pr-2">
-                            <span class="text-xs text-slate-200 block font-medium">No Consistency / Add-On</span>
-                            <span class="text-[10px] text-slate-400">Increases max daily profit cap to 50%</span>
-                        </div>
-                        <label class="relative inline-flex items-center cursor-pointer">
-                            <input type="checkbox" id="addonToggle" onchange="updateCalculator()" class="sr-only peer">
-                            <div class="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Summary Overview Box -->
-                <div class="bg-slate-950/80 border border-slate-800 rounded-lg p-3.5 flex flex-col justify-between">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                        Active Consistency Limit
-                        <i data-lucide="shield-alert" class="w-4 h-4 text-brand-400"></i>
-                    </span>
-                    <div class="mt-2 flex items-baseline justify-between">
-                        <span id="activeLimitPct" class="text-2xl font-extrabold text-white">35%</span>
-                        <span id="activeLimitFormula" class="text-xs font-mono text-slate-400">Target × 35%</span>
-                    </div>
-                    <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-2">
-                        <div id="limitBar" class="bg-brand-500 h-full transition-all duration-300" style="width: 35%;"></div>
-                    </div>
-                </div>
-
+    <!-- Account Preset Selection Bar -->
+    <section class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 shadow-xl">
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-3 w-full lg:w-auto">
+          <div class="p-2.5 rounded-xl bg-emerald-950 border border-gold-500/40 text-gold-400">
+            <i data-lucide="wallet" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-gold-300/80 uppercase tracking-wider">Select Account Size</span>
+            <div class="flex items-center space-x-2">
+              <span id="selectedBalanceDisplay" class="text-xl font-extrabold text-white">$100,000</span>
+              <span id="accountTypeBadge" class="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-md bg-gold-500/20 text-gold-300 border border-gold-500/30">1-Step Challenge</span>
             </div>
-        </section>
-
-        <!-- Position & Account Limits + Maximum Lot Size Section -->
-        <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            <!-- Section 1.2.7 Position & Account Limit Checker (6 Cols) -->
-            <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i data-lucide="layers" class="w-4 h-4 text-purple-400"></i> 1.2.7 Position & Account Limits
-                    </h3>
-                    <span class="px-2 py-0.5 text-[11px] font-medium rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
-                        Rule Compliance
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Position Limits Counter -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-3">
-                        <span class="text-xs font-semibold text-slate-300 block">Open Positions Checker</span>
-                        
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center text-xs">
-                                <label class="text-slate-400">Positions in single asset:</label>
-                                <input type="number" id="posPerAssetInput" value="3" min="0" max="10" oninput="checkPositionLimits()"
-                                    class="w-16 px-2 py-1 bg-slate-950 border border-slate-700 rounded font-mono text-white text-right focus:border-brand-500">
-                            </div>
-                            <div id="posAssetStatus" class="text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center">
-                                <span>Max 5 per asset</span>
-                                <strong class="font-mono">OK (3/5)</strong>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 pt-2 border-t border-slate-800/80">
-                            <div class="flex justify-between items-center text-xs">
-                                <label class="text-slate-400">Total account positions:</label>
-                                <input type="number" id="posTotalInput" value="8" min="0" max="25" oninput="checkPositionLimits()"
-                                    class="w-16 px-2 py-1 bg-slate-950 border border-slate-700 rounded font-mono text-white text-right focus:border-brand-500">
-                            </div>
-                            <div id="posTotalStatus" class="text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center">
-                                <span>Max 13 total</span>
-                                <strong class="font-mono">OK (8/13)</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Trader Account Holdings Checker -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-3">
-                        <span class="text-xs font-semibold text-slate-300 block">Trader Account Limits</span>
-
-                        <div class="space-y-2">
-                            <div class="flex justify-between items-center text-xs">
-                                <label class="text-slate-400">Active challenge accounts:</label>
-                                <input type="number" id="accChallengeInput" value="2" min="0" max="10" oninput="checkAccountLimits()"
-                                    class="w-16 px-2 py-1 bg-slate-950 border border-slate-700 rounded font-mono text-white text-right focus:border-brand-500">
-                            </div>
-                            <div id="accChallengeStatus" class="text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center">
-                                <span>Max 4 accounts</span>
-                                <strong class="font-mono">OK (2/4)</strong>
-                            </div>
-                        </div>
-
-                        <div class="space-y-2 pt-2 border-t border-slate-800/80">
-                            <div class="flex justify-between items-center text-xs">
-                                <label class="text-slate-400">Live (funded) accounts:</label>
-                                <input type="number" id="accLiveInput" value="1" min="0" max="5" oninput="checkAccountLimits()"
-                                    class="w-16 px-2 py-1 bg-slate-950 border border-slate-700 rounded font-mono text-white text-right focus:border-brand-500">
-                            </div>
-                            <div id="accLiveStatus" class="text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center">
-                                <span>Max 1 live account</span>
-                                <strong class="font-mono">OK (1/1)</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Section 1.2.8 Maximum Lot Sizes Calculator (6 Cols) -->
-            <div class="lg:col-span-6 bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                        <i data-lucide="scale" class="w-4 h-4 text-brand-400"></i> 1.2.8 BloomFunded Max Lot Sizes
-                    </h3>
-                    <span class="px-2 py-0.5 text-[11px] font-medium rounded bg-brand-500/10 text-brand-300 border border-brand-500/20">
-                        Risk Management
-                    </span>
-                </div>
-
-                <!-- Lot Size Asset Matrix -->
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between text-xs">
-                        <label class="text-slate-300 font-medium">Select Trading Asset:</label>
-                        <select id="assetSelect" onchange="calculateMaxLotSize()" class="px-2.5 py-1 bg-slate-950 border border-slate-700 rounded text-xs text-white">
-                            <option value="Volatility 25">Volatility 25</option>
-                        </select>
-                    </div>
-
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-3">
-                        <div class="flex justify-between items-center">
-                            <span class="text-xs text-slate-400">Max Allowed Lot Size for <span id="lotAccSizeDisplay" class="text-white font-bold">$100,000</span>:</span>
-                            <span id="maxLotSizeDisplay" class="text-xl font-mono font-bold text-brand-400">38.4 Lots</span>
-                        </div>
-
-                        <!-- Lot Size Checker -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-800">
-                            <div>
-                                <label class="text-[11px] text-slate-400 block mb-1">Test Planned Lot Size:</label>
-                                <input type="number" id="testLotInput" value="20" step="0.1" oninput="testLotCompliance()"
-                                    class="w-full px-2.5 py-1.5 bg-slate-950 border border-slate-700 rounded text-white font-mono text-xs focus:outline-none focus:border-brand-500">
-                            </div>
-                            <div id="lotComplianceResult" class="p-2 rounded border text-xs flex items-center justify-between bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                                <span class="flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Compliant</span>
-                                <span id="lotUsagePct" class="font-mono text-[11px]">52.1% of max</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Lot Reference Table -->
-                    <div class="overflow-x-auto rounded border border-slate-800 text-[11px]">
-                        <table class="w-full text-left text-slate-300">
-                            <thead class="bg-slate-950 text-slate-400 border-b border-slate-800">
-                                <tr>
-                                    <th class="p-2">Asset</th>
-                                    <th class="p-2">5k</th>
-                                    <th class="p-2">10k</th>
-                                    <th class="p-2">25k</th>
-                                    <th class="p-2">50k</th>
-                                    <th class="p-2">100k</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-800/60 font-mono">
-                                <tr>
-                                    <td class="p-2 font-sans text-slate-200 font-medium">Volatility 25</td>
-                                    <td class="p-2 text-slate-400">1.92</td>
-                                    <td class="p-2 text-slate-400">3.84</td>
-                                    <td class="p-2 text-slate-400">9.60</td>
-                                    <td class="p-2 text-slate-400">19.20</td>
-                                    <td class="p-2 text-brand-400 font-bold">38.40</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </section>
-
-        <!-- NEW: Manual Trade Risk Position Size Calculator Section -->
-        <section class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    <i data-lucide="shield" class="w-4 h-4 text-emerald-400"></i> Manual Trading Risk & Position Size Calculator
-                </h3>
-                <span class="px-2 py-0.5 text-[11px] font-medium rounded bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
-                    Trade Sizing Tool
-                </span>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                <!-- Risk Percentage / Amount Selector -->
-                <div class="space-y-2">
-                    <label class="text-xs font-medium text-slate-300 flex justify-between">
-                        <span>Risk Target (% or $)</span>
-                        <span id="calcRiskAmountDisplay" class="text-emerald-400 font-bold">$1,000 (1.0%)</span>
-                    </label>
-                    <div class="grid grid-cols-2 gap-2">
-                        <div class="relative">
-                            <input type="number" id="riskPctInput" value="1.0" step="0.1" min="0.1" max="10" oninput="calculateManualRisk()"
-                                class="w-full pr-6 pl-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-brand-500">
-                            <span class="absolute inset-y-0 right-0 pr-2 flex items-center text-slate-500 text-xs">%</span>
-                        </div>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-500 text-xs">$</span>
-                            <input type="number" id="riskDollarsInput" value="1000" step="50" oninput="calculateManualRiskFromDollars()"
-                                class="w-full pl-6 pr-2 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-brand-500">
-                        </div>
-                    </div>
-                    <!-- Risk Presets -->
-                    <div class="flex gap-1.5 pt-1">
-                        <button onclick="setRiskPct(0.25)" class="px-2 py-0.5 text-[11px] rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">0.25%</button>
-                        <button onclick="setRiskPct(0.5)" class="px-2 py-0.5 text-[11px] rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">0.5%</button>
-                        <button onclick="setRiskPct(1.0)" class="px-2 py-0.5 text-[11px] rounded bg-slate-800 border border-emerald-500/50 text-emerald-400 font-medium">1.0%</button>
-                        <button onclick="setRiskPct(2.0)" class="px-2 py-0.5 text-[11px] rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">2.0%</button>
-                    </div>
-                </div>
-
-                <!-- Stop Loss Pips / Points Input -->
-                <div class="space-y-2">
-                    <label class="text-xs font-medium text-slate-300 flex justify-between">
-                        <span>Stop Loss (Pips / Points)</span>
-                        <span class="text-slate-400 text-[11px]">Distance</span>
-                    </label>
-                    <div class="relative">
-                        <input type="number" id="stopLossPipsInput" value="20" step="1" min="1" oninput="calculateManualRisk()"
-                            class="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-brand-500">
-                    </div>
-                    <p class="text-[11px] text-slate-500">Difference between Entry and Stop Loss price</p>
-                </div>
-
-                <!-- Pip / Point Value Settings -->
-                <div class="space-y-2">
-                    <label class="text-xs font-medium text-slate-300 flex justify-between">
-                        <span>Pip Value per Standard Lot ($)</span>
-                    </label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500">$</span>
-                        <input type="number" id="pipValueInput" value="10" step="0.5" min="0.01" oninput="calculateManualRisk()"
-                            class="w-full pl-7 pr-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-mono text-sm focus:outline-none focus:border-brand-500">
-                    </div>
-                    <!-- Asset Pip Presets -->
-                    <div class="flex flex-wrap gap-1.5 pt-0.5">
-                        <button onclick="setPipValue(10, 'Forex Majors')" class="px-2 py-0.5 text-[10px] rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Forex ($10)</button>
-                        <button onclick="setPipValue(1, 'Indices/Gold')" class="px-2 py-0.5 text-[10px] rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Gold/Index ($1)</button>
-                        <button onclick="setPipValue(0.1, 'Crypto/Synthetics')" class="px-2 py-0.5 text-[10px] rounded bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700">Synth ($0.1)</button>
-                    </div>
-                </div>
-
-                <!-- Calculated Position Size Card -->
-                <div class="bg-slate-950/90 border border-slate-800 rounded-lg p-3.5 flex flex-col justify-between">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between">
-                        Recommended Position Size
-                        <i data-lucide="calculator" class="w-4 h-4 text-emerald-400"></i>
-                    </span>
-                    <div class="mt-1 flex items-baseline justify-between">
-                        <span id="recommendedLotsDisplay" class="text-2xl font-extrabold text-emerald-400 font-mono">5.00 Lots</span>
-                        <span id="unitsDisplay" class="text-xs text-slate-400 font-mono">500,000 units</span>
-                    </div>
-                    <div id="riskCapWarning" class="mt-2 text-[11px] p-1.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-center font-mono">
-                        Within prop firm lot limit cap
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Main Dashboard Split View -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-
-            <!-- Left Side: Dynamic Metrics & Analysis Panel (7 Cols) -->
-            <div class="lg:col-span-7 space-y-6">
-
-                <!-- Challenge Phase View (Shown when 1step or 2step selected) -->
-                <div id="challengeSection" class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-5">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i data-lucide="target" class="w-4 h-4 text-brand-500"></i> Challenge Evaluation Metrics
-                        </h3>
-                        <span id="challengeStatusBadge" class="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Standard Limits Active
-                        </span>
-                    </div>
-
-                    <!-- Core Metrics Grid -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
-                            <span class="text-xs text-slate-400 block mb-1">Required Profit Target</span>
-                            <div class="flex items-baseline justify-between">
-                                <span id="calcProfitTarget" class="text-2xl font-bold text-white font-mono">$10,000</span>
-                                <span id="calcTargetPct" class="text-xs text-brand-400 font-semibold">(10%)</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500 mt-2">Minimum total profit needed to pass</p>
-                        </div>
-
-                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
-                            <span class="text-xs text-slate-400 block mb-1">Max Single Trading Day Profit</span>
-                            <div class="flex items-baseline justify-between">
-                                <span id="calcMaxDayProfit" class="text-2xl font-bold text-amber-400 font-mono">$3,500</span>
-                                <span id="calcMaxDayPct" class="text-xs text-amber-500 font-semibold">(35% of Target)</span>
-                            </div>
-                            <p class="text-[11px] text-slate-500 mt-2">No single day may exceed this profit</p>
-                        </div>
-                    </div>
-
-                    <!-- Quick Single Day Compliance Tester -->
-                    <div class="bg-slate-950/60 p-4 rounded-lg border border-slate-800 space-y-3">
-                        <h4 class="text-xs font-semibold text-slate-300">Quick Single Day Compliance Check</h4>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
-                            <div>
-                                <label class="text-[11px] text-slate-400 block mb-1">Test Single Day Profit ($)</label>
-                                <input type="number" id="quickTestProfit" value="2500" oninput="testSingleDay()"
-                                    class="w-full px-3 py-1.5 bg-slate-900 border border-slate-700 rounded text-white font-mono text-sm focus:outline-none focus:border-brand-500">
-                            </div>
-                            <div id="quickTestResult" class="p-2.5 rounded border text-xs font-medium flex items-center justify-between bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
-                                <span class="flex items-center gap-1.5">
-                                    <i data-lucide="check-circle-2" class="w-4 h-4"></i> Within Limit
-                                </span>
-                                <span id="quickTestShare" class="font-mono">25.0% of target</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Funded Phase View (Shown when Funded selected) -->
-                <div id="fundedSection" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-5">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                            <i data-lucide="wallet" class="w-4 h-4 text-emerald-400"></i> Funded Phase Payout Compliance
-                        </h3>
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                            Payout Consistency Rule
-                        </span>
-                    </div>
-
-                    <!-- Payout Inputs -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-2">
-                            <label class="text-xs font-medium text-slate-300 block">
-                                Requested Payout Amount ($)
-                            </label>
-                            <input type="number" id="payoutRequestInput" value="4000" step="100" oninput="calculatePayoutConsistency()"
-                                class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono text-base font-bold focus:outline-none focus:border-brand-500">
-                            <div class="text-[11px] text-slate-400 flex justify-between">
-                                <span>Max allowed single day:</span>
-                                <strong id="fundedMaxAllowed" class="text-amber-400 font-mono">$1,400</strong>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800 space-y-2">
-                            <label class="text-xs font-medium text-slate-300 block">
-                                Highest Single Day Profit ($)
-                            </label>
-                            <input type="number" id="highestDayInput" value="1800" step="50" oninput="calculatePayoutConsistency()"
-                                class="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white font-mono text-base font-bold focus:outline-none focus:border-brand-500">
-                            <div class="text-[11px] text-slate-400 flex justify-between">
-                                <span>Share of request:</span>
-                                <strong id="fundedHighestShare" class="text-white font-mono">45.0%</strong>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Funded Payout Result Alert Box -->
-                    <div id="payoutStatusBox" class="p-4 rounded-xl border transition-all duration-300 space-y-3 bg-amber-500/10 border-amber-500/30 text-amber-300">
-                        <div class="flex items-start justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <div id="payoutStatusIcon" class="p-2 rounded-lg bg-amber-500/20 text-amber-400">
-                                    <i data-lucide="alert-triangle" class="w-5 h-5"></i>
-                                </div>
-                                <div>
-                                    <h4 id="payoutStatusTitle" class="font-bold text-sm text-white">Payout Exceeds Consistency Limit</h4>
-                                    <p id="payoutStatusDesc" class="text-xs text-slate-300 mt-0.5">Highest daily profit exceeds the permitted cap for this requested payout.</p>
-                                </div>
-                            </div>
-                            <span id="payoutStatusBadge" class="text-xs font-bold uppercase px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                                Action Required
-                            </span>
-                        </div>
-
-                        <!-- Calculation Breakdown for Required Profit -->
-                        <div id="payoutCorrectionDetails" class="bg-slate-950/80 p-3.5 rounded-lg border border-slate-800/80 text-xs space-y-2">
-                            <div class="flex justify-between items-center text-slate-300">
-                                <span>Required Payout Target for $1,800 day:</span>
-                                <strong id="reqPayoutTarget" class="text-emerald-400 font-mono text-sm">$5,142.86</strong>
-                            </div>
-                            <div class="flex justify-between items-center text-slate-300">
-                                <span>Additional Profit to Accumulate:</span>
-                                <strong id="reqAdditionalProfit" class="text-amber-400 font-mono text-sm">+$1,142.86</strong>
-                            </div>
-                            <div class="text-[11px] text-slate-400 pt-1 border-t border-slate-800 font-mono">
-                                Formula: <span class="text-slate-300">$1,800 / 0.35 = $5,142.86</span> (Accumulate more profit before requesting)
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Daily Profit Simulator & Multi-day Log -->
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
-                    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800 pb-3">
-                        <div>
-                            <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                                <i data-lucide="list-checks" class="w-4 h-4 text-brand-500"></i> Daily Profit Simulator & Log
-                            </h3>
-                            <p class="text-xs text-slate-400">Input daily trading profits to verify complete sequence compliance.</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="addDailyRow()" class="px-2.5 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded text-xs font-medium flex items-center gap-1 transition">
-                                <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add Day
-                            </button>
-                            <button onclick="clearDailyLogs()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs font-medium transition">
-                                Reset
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Log Summary Progress -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-2">
-                        <div class="flex justify-between text-xs">
-                            <span class="text-slate-400">Total Accumulated Profit:</span>
-                            <span id="logTotalProfit" class="font-bold font-mono text-white">$0.00</span>
-                        </div>
-                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                            <div id="logProgressBar" class="bg-emerald-500 h-full transition-all duration-300" style="width: 0%;"></div>
-                        </div>
-                        <div class="flex justify-between text-[11px] text-slate-500">
-                            <span id="logProgressPct">0% of target achieved</span>
-                            <span id="logHighestDaySummary">Highest Day: $0</span>
-                        </div>
-                    </div>
-
-                    <!-- Table Container -->
-                    <div class="overflow-x-auto max-h-64 overflow-y-auto rounded-lg border border-slate-800">
-                        <table class="w-full text-left text-xs text-slate-300">
-                            <thead class="bg-slate-950 text-slate-400 font-semibold border-b border-slate-800 sticky top-0">
-                                <tr>
-                                    <th class="p-2.5 w-20">Day</th>
-                                    <th class="p-2.5">Profit ($)</th>
-                                    <th class="p-2.5 text-center">Share of Target</th>
-                                    <th class="p-2.5 text-center">Consistency Status</th>
-                                    <th class="p-2.5 text-right">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dailyLogTbody" class="divide-y divide-slate-800/60 bg-slate-900/50">
-                                <!-- Dynamic Rows Inserted Here -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Overall Sequence Banner -->
-                    <div id="sequenceStatusBanner" class="p-3 rounded-lg text-xs flex items-center justify-between border bg-slate-950 border-slate-800 text-slate-400">
-                        <span class="flex items-center gap-2">
-                            <i data-lucide="info" class="w-4 h-4"></i> Log trading days above to run multi-day consistency check.
-                        </span>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Right Side: Rule Explainer & Dynamic Formula Cards (5 Cols) -->
-            <div class="lg:col-span-5 space-y-6">
-
-                <!-- Rule Reference Card -->
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-4">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-3">
-                        <i data-lucide="book-open" class="w-4 h-4 text-brand-500"></i> Consistency Rule Breakdown
-                    </h3>
-
-                    <!-- Rule 1.2.4 Card -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-1.5 text-xs">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-brand-400">1-Step Challenge (35%)</span>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] bg-brand-500/10 text-brand-300 border border-brand-500/30">Target: 10%</span>
-                        </div>
-                        <p class="text-slate-300 leading-relaxed">
-                            No single trading day may generate profit greater than <strong>35%</strong> of the profit target.
-                        </p>
-                        <div class="bg-slate-900 p-2 rounded font-mono text-[11px] text-slate-400">
-                            Max Allowed Day = 35% × Profit Target
-                        </div>
-                    </div>
-
-                    <!-- Rule 2-Step Card -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-1.5 text-xs">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-indigo-400">2-Step Challenge (40%)</span>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/30">P1: 8% | P2: 5%</span>
-                        </div>
-                        <p class="text-slate-300 leading-relaxed">
-                            Standard limit allows up to <strong>40%</strong> of the target in a single day.
-                        </p>
-                        <div class="bg-slate-900 p-2 rounded font-mono text-[11px] text-slate-400">
-                            Max Allowed Day = 40% × Profit Target
-                        </div>
-                    </div>
-
-                    <!-- Add-On Option Card -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-1.5 text-xs">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-emerald-400">Consistency Add-On (50% Cap)</span>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-500/10 text-emerald-300 border border-emerald-500/30">Add-On Toggle</span>
-                        </div>
-                        <p class="text-slate-300 leading-relaxed">
-                            Removes standard consistency constraints, but enforces a strict hard cap of <strong>50%</strong> of the profit target or requested payout per day.
-                        </p>
-                    </div>
-
-                    <!-- Position & Lot Rules Card -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-1.5 text-xs">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-purple-400">1.2.7 & 1.2.8 Exposure Limits</span>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] bg-purple-500/10 text-purple-300 border border-purple-500/30">Position / Lot</span>
-                        </div>
-                        <p class="text-slate-300 leading-relaxed">
-                            Max 5 open positions per asset, max 13 total account positions. Max accounts: 4 Challenge / 1 Live.
-                        </p>
-                    </div>
-
-                    <!-- Funded Phase Rule Card -->
-                    <div class="bg-slate-950 p-3.5 rounded-lg border border-slate-800 space-y-1.5 text-xs">
-                        <div class="flex items-center justify-between">
-                            <span class="font-bold text-amber-400">Funded Phase Payout Rule</span>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] bg-amber-500/10 text-amber-300 border border-amber-500/30">Payout Caps</span>
-                        </div>
-                        <p class="text-slate-300 leading-relaxed">
-                            The 35% (or 50%) cap applies directly to the <strong>requested payout amount</strong>, not total account equity.
-                        </p>
-                        <div class="bg-slate-900 p-2 rounded font-mono text-[11px] text-slate-400 space-y-1">
-                            <div>If Highest Day > Limit:</div>
-                            <div class="text-amber-300">Required Payout Target = Highest Day Profit / Limit %</div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Dynamic Example Walkthrough -->
-                <div class="bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl space-y-3">
-                    <h3 class="text-sm font-bold text-white flex items-center gap-2 border-b border-slate-800 pb-2">
-                        <i data-lucide="help-circle" class="w-4 h-4 text-brand-500"></i> Dynamic Walkthrough Example
-                    </h3>
-                    <div id="exampleBox" class="text-xs text-slate-300 leading-relaxed space-y-2">
-                        <!-- Dynamic Text updated in JS -->
-                    </div>
-                </div>
-
-            </div>
-
+          </div>
         </div>
 
-    </main>
+        <!-- Account Size Buttons -->
+        <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end">
+          <button onclick="setAccountSize(5000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="5000">$5k</button>
+          <button onclick="setAccountSize(10000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="10000">$10k</button>
+          <button onclick="setAccountSize(25000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="25000">$25k</button>
+          <button onclick="setAccountSize(50000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="50000">$50k</button>
+          <button onclick="setAccountSize(100000)" class="preset-btn active px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-400 bg-gold-500/20 text-gold-300 shadow-md" data-size="100000">$100k</button>
+          <button onclick="setAccountSize(200000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="200000">$200k</button>
+          <button onclick="toggleCustomBalanceInput()" class="px-3.5 py-1.5 rounded-xl border border-gold-500/30 bg-emerald-950 text-gold-400 hover:bg-gold-500/10 text-xs font-bold transition-all flex items-center space-x-1">
+            <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
+            <span>Custom</span>
+          </button>
+        </div>
+      </div>
 
-    <!-- Footer -->
-    <footer class="border-t border-slate-800 bg-slate-900 py-4 text-center text-xs text-slate-500 mt-8">
-        <p>Prop Firm Consistency & Risk Calculator &bull; Designed for Prop Traders & Risk Managers</p>
-    </footer>
+      <!-- Custom Capital Input -->
+      <div id="customBalanceWrapper" class="hidden mt-4 pt-3 border-t border-gold-500/20 flex items-center space-x-3">
+        <label class="text-xs font-medium text-gold-300">Custom Account Equity ($):</label>
+        <input type="number" id="customBalanceInput" value="150000" oninput="applyCustomBalance(this.value)" class="w-48 bg-emerald-950 border border-gold-500/40 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold-400">
+      </div>
+    </section>
 
-    <!-- App Logic -->
-    <script>
-        // State variables
-        let accountSize = 100000;
-        let challengeType = '1step'; // '1step', '2step_p1', '2step_p2', 'funded'
-        let addonActive = false;
-        let isDarkMode = true;
-        let dailyLogs = [
-            { day: 1, profit: 1200 },
-            { day: 2, profit: 1800 },
-            { day: 3, profit: 900 }
-        ];
+    <!-- TAB 1: CONSISTENCY ENGINE -->
+    <div id="tab-consistency-content" class="tab-pane space-y-6">
+      
+      <!-- Challenge Configuration Bar -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div class="text-xs text-gold-300/80 font-medium mb-1">Challenge Mode</div>
+          <select id="challengeTypeSelect" onchange="calculateConsistency()" class="bg-emerald-950 border border-gold-500/40 text-slate-100 font-bold text-xs rounded-xl p-2.5 focus:outline-none focus:border-gold-400">
+            <option value="1step" selected>1-Step Challenge (35% Daily Cap)</option>
+            <option value="2step">2-Step Challenge (40% Daily Cap)</option>
+            <option value="payout">Funded Payout Consistency (35% Cap)</option>
+          </select>
+        </div>
 
-        // Theme Toggle Function
-        function toggleTheme() {
-            isDarkMode = !isDarkMode;
-            const htmlEl = document.documentElement;
-            const themeBtn = document.getElementById('themeBtn');
-            const themeIcon = document.getElementById('themeIcon');
-            const themeLabel = document.getElementById('themeLabel');
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gold-300/80 font-medium">Profit Target Rate</span>
+            <span id="targetPercentLabel" class="text-xs font-bold text-gold-400">10%</span>
+          </div>
+          <input type="number" id="targetPercentInput" value="10" oninput="calculateConsistency()" class="bg-emerald-950 border border-gold-500/40 text-white font-bold text-xs rounded-xl p-2.5 focus:outline-none focus:border-gold-400 mt-2">
+        </div>
 
-            if (isDarkMode) {
-                htmlEl.classList.add('dark');
-                document.body.className = "bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased";
-                if (themeLabel) themeLabel.innerText = "Light Mode";
-                if (themeIcon) {
-                    themeIcon.setAttribute('data-lucide', 'sun');
-                    themeIcon.className = "w-4 h-4 text-amber-400";
-                }
-            } else {
-                htmlEl.classList.remove('dark');
-                document.body.className = "bg-slate-50 text-slate-900 min-h-screen flex flex-col antialiased";
-                if (themeLabel) themeLabel.innerText = "Dark Mode";
-                if (themeIcon) {
-                    themeIcon.setAttribute('data-lucide', 'moon');
-                    themeIcon.className = "w-4 h-4 text-indigo-600";
-                }
-            }
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs text-gold-300/80 font-medium">Consistency Add-On (50%)</span>
+            <input type="checkbox" id="consistencyAddonCheck" onchange="calculateConsistency()" class="accent-gold-500 w-4 h-4 rounded cursor-pointer">
+          </div>
+          <p class="text-[10px] text-slate-400 mt-2">Overrides daily max profit cap to 50% of overall profit target or requested payout.</p>
+        </div>
 
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
+          <span class="text-xs text-gold-300/80 font-medium">Max Daily Profit Cap ($)</span>
+          <div id="maxDailyProfitCapDisplay" class="text-2xl font-black text-gold-300 tracking-tight">$3,500.00</div>
+          <p id="capFormulaSubtext" class="text-[10px] text-gold-400/70">35% of $10,000 Target</p>
+        </div>
 
-        // Lot Size Scaling Reference (base per $1k = 0.384 for Volatility 25)
-        const LOT_TABLE = {
-            'Volatility 25': {
-                5000: 1.92,
-                10000: 3.84,
-                25000: 9.60,
-                50000: 19.20,
-                100000: 38.40
-            }
-        };
+      </div>
 
-        // Rule Matrix Definition
-        const RULES = {
-            '1step': {
-                name: '1-Step Challenge',
-                targetPct: 0.10,
-                defaultLimitPct: 0.35,
-                addonLimitPct: 0.50,
-                desc: '10% target, standard 35% daily profit limit.'
-            },
-            '2step_p1': {
-                name: '2-Step Challenge (Phase 1)',
-                targetPct: 0.08,
-                defaultLimitPct: 0.40,
-                addonLimitPct: 0.50,
-                desc: '8% target, standard 40% daily profit limit.'
-            },
-            '2step_p2': {
-                name: '2-Step Challenge (Phase 2)',
-                targetPct: 0.05,
-                defaultLimitPct: 0.40,
-                addonLimitPct: 0.50,
-                desc: '5% target, standard 40% daily profit limit.'
-            },
-            'funded': {
-                name: 'Funded Phase (Payout)',
-                targetPct: null, // based on payout request
-                defaultLimitPct: 0.35,
-                addonLimitPct: 0.50,
-                desc: '35% cap applied directly to requested payout amount.'
-            }
-        };
-
-        // Initialize icons and UI
-        window.onload = function() {
-            if (window.lucide) {
-                lucide.createIcons();
-            }
+      <!-- Main Consistency Dynamic Metrics -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: Summary Matrix Card -->
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-gold-400"></i>
+              <span>Compliance Overview</span>
+            </h3>
             
-            // Event listener for account size input
-            document.getElementById('accountSizeInput').addEventListener('input', function(e) {
-                const val = parseFloat(e.target.value);
-                accountSize = isNaN(val) || val <= 0 ? 0 : val;
-                document.getElementById('accountSizeDisplay').innerText = '$' + accountSize.toLocaleString();
-                updateCalculator();
-            });
+            <div class="mt-4 space-y-3">
+              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
+                <span class="text-slate-400">Required Profit Target</span>
+                <span id="requiredTargetAmount" class="font-bold text-white">$10,000.00</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
+                <span class="text-slate-400">Current Logged Profit</span>
+                <span id="currentLoggedProfit" class="font-bold text-emerald-400">$0.00</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
+                <span class="text-slate-400">Highest Single Day Profit</span>
+                <span id="highestSingleDayDisplay" class="font-bold text-gold-300">$0.00</span>
+              </div>
+              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
+                <span class="text-slate-400">Highest Single Day % Share</span>
+                <span id="highestSingleDayPercent" class="font-bold text-gold-300">0.0%</span>
+              </div>
+              <div id="payoutCalcRow" class="hidden flex justify-between items-center py-2 border-b border-gold-500/10 text-xs bg-gold-500/10 p-2 rounded-lg">
+                <span class="text-gold-300 font-semibold">Min Profit Needed for Full Payout</span>
+                <span id="requiredProfitForPayout" class="font-extrabold text-gold-400">$0.00</span>
+              </div>
+            </div>
+          </div>
 
-            updateCalculator();
-            checkPositionLimits();
-            checkAccountLimits();
-            calculateMaxLotSize();
-            calculateManualRisk();
-            renderDailyLogs();
-        };
+          <!-- Overall Compliance Status Badge -->
+          <div id="complianceStatusBox" class="p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 text-center">
+            <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Status</span>
+            <div id="complianceStatusText" class="text-lg font-black text-emerald-300">PASSED - IN COMPLIANCE</div>
+            <p id="complianceStatusDesc" class="text-[11px] text-slate-300 mt-1">No trading days exceed the maximum single-day rule limit.</p>
+          </div>
+        </div>
 
-        function setAccountSize(size) {
-            accountSize = size;
-            document.getElementById('accountSizeInput').value = size;
-            document.getElementById('accountSizeDisplay').innerText = '$' + size.toLocaleString();
-            updateCalculator();
+        <!-- Right: Daily Profit Tracker & Sequence Builder -->
+        <div class="lg:col-span-2 bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
+              <i data-lucide="list-plus" class="w-4 h-4 text-gold-400"></i>
+              <span>Multi-Day Trading Sequence Tracker</span>
+            </h3>
+            <button onclick="clearDailyLogs()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center space-x-1">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+              <span>Reset Days</span>
+            </button>
+          </div>
+
+          <!-- Add Day Input Form -->
+          <div class="flex gap-2">
+            <input type="number" id="newDayProfitInput" placeholder="Enter day profit/loss ($)" class="flex-grow bg-emerald-950 border border-gold-500/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-400">
+            <button onclick="addDailyProfit()" class="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md">
+              <i data-lucide="plus" class="w-4 h-4"></i>
+              <span>Add Day</span>
+            </button>
+          </div>
+
+          <!-- Log Table -->
+          <div class="overflow-x-auto max-h-64 overflow-y-auto rounded-xl border border-gold-500/20">
+            <table class="w-full text-left text-xs text-slate-300">
+              <thead class="bg-emerald-950 text-gold-300 sticky top-0 uppercase text-[10px] tracking-wider border-b border-gold-500/30">
+                <tr>
+                  <th class="p-3">Day</th>
+                  <th class="p-3">Profit / Loss</th>
+                  <th class="p-3">% of Target / Request</th>
+                  <th class="p-3">Compliance Status</th>
+                  <th class="p-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="dailyProfitTableBody" class="divide-y divide-gold-500/10 bg-[#041f17]/50">
+                <!-- Dynamically Inserted -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 2: MANUAL RISK & POSITION CALCULATOR -->
+    <div id="tab-position-content" class="tab-pane hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Input Controls -->
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
+          <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
+            <i data-lucide="calculator" class="w-4 h-4 text-gold-400"></i>
+            <span>Position Risk Parameters</span>
+          </h3>
+
+          <div class="space-y-3 text-xs">
+            <div>
+              <label class="text-gold-300 font-medium">Asset Class / Symbol</label>
+              <select id="assetSelect" onchange="handleAssetChange()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 text-white font-semibold rounded-xl p-2.5 focus:outline-none focus:border-gold-400">
+                <option value="vol25" selected>Deriv - Volatility 25 Index</option>
+                <option value="forex">Forex Majors (0.0001 Pip)</option>
+                <option value="indices">Indices / US30 / NAS100</option>
+                <option value="crypto">Cryptocurrency / BTCUSD</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="text-gold-300 font-medium">Risk Basis</label>
+              <div class="grid grid-cols-2 gap-2 mt-1">
+                <button type="button" onclick="setRiskMode('percent')" id="riskModePercentBtn" class="p-2 rounded-xl border border-gold-400 bg-gold-500/20 text-gold-300 font-bold text-center">Risk %</button>
+                <button type="button" onclick="setRiskMode('amount')" id="riskModeAmountBtn" class="p-2 rounded-xl border border-gold-500/20 bg-emerald-950 text-slate-300 font-bold text-center">Risk $ Amount</button>
+              </div>
+            </div>
+
+            <div id="riskPercentWrapper">
+              <label class="text-gold-300 font-medium">Account Risk (%)</label>
+              <input type="number" id="riskPercentInput" value="1" step="0.25" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
+            </div>
+
+            <div id="riskAmountWrapper" class="hidden">
+              <label class="text-gold-300 font-medium">Account Risk ($)</label>
+              <input type="number" id="riskAmountInput" value="1000" step="50" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
+            </div>
+
+            <div>
+              <label class="text-gold-300 font-medium">Stop Loss Distance (Ticks / Pips)</label>
+              <input type="number" id="stopLossInput" value="500" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
+            </div>
+
+            <div>
+              <label class="text-gold-300 font-medium">Tick / Pip Value ($ per 1 Lot)</label>
+              <input type="number" id="tickValueInput" value="0.0005" step="0.0001" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
+              <p id="assetNote" class="text-[10px] text-gold-400/70 mt-1">Specialized Deriv Volatility 25: $0.0005 per tick.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculated Position Results -->
+        <div class="lg:col-span-2 bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-5 flex flex-col justify-between">
+          <div>
+            <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
+              <i data-lucide="pie-chart" class="w-4 h-4 text-gold-400"></i>
+              <span>Calculated Sizing & Lot Limit Validation</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              
+              <div class="bg-emerald-950 p-4 rounded-xl border border-gold-500/20">
+                <span class="text-xs text-slate-400 font-medium">Calculated Position Size</span>
+                <div id="calculatedLotSize" class="text-3xl font-black text-gold-300 mt-1">4.00 Lots</div>
+                <span class="text-[10px] text-gold-400/80">Based on $1,000 Risk & 500 Tick SL</span>
+              </div>
+
+              <div class="bg-emerald-950 p-4 rounded-xl border border-gold-500/20">
+                <span class="text-xs text-slate-400 font-medium">HerConsolidation Vol 25 Max Lot Limit</span>
+                <div id="maxAllowedLotSize" class="text-3xl font-black text-white mt-1">38.40 Lots</div>
+                <span class="text-[10px] text-slate-400">Specific to selected account size ($100k)</span>
+              </div>
+
+            </div>
+
+            <!-- Position Limit Warnings -->
+            <div id="lotWarningBox" class="mt-4 p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-start space-x-3">
+              <i data-lucide="check-circle-2" id="lotWarningIcon" class="w-5 h-5 text-emerald-400 mt-0.5"></i>
+              <div>
+                <h4 id="lotWarningTitle" class="text-xs font-bold text-emerald-400">Position Size Within Limits</h4>
+                <p id="lotWarningDesc" class="text-[11px] text-slate-300 mt-0.5">Your calculated lot size is safely below the HerConsolidation maximum lot threshold for this account size.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- HerConsolidation Lot Scaling Rules Chart -->
+          <div class="border-t border-gold-500/20 pt-4">
+            <h4 class="text-xs font-bold text-gold-300 mb-2">HerConsolidation Volatility 25 Max Lot Scaling Reference Table</h4>
+            <div class="grid grid-cols-5 gap-2 text-center text-xs">
+              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$5k</div><div class="font-bold text-gold-300">1.92</div></div>
+              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$10k</div><div class="font-bold text-gold-300">3.84</div></div>
+              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$25k</div><div class="font-bold text-gold-300">9.60</div></div>
+              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$50k</div><div class="font-bold text-gold-300">19.20</div></div>
+              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$100k</div><div class="font-bold text-gold-300">38.40</div></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TAB 3: ACCOUNT LIMITS & RULES -->
+    <div id="tab-limits-content" class="tab-pane hidden space-y-6">
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Position Limits Card -->
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 rounded-xl bg-gold-500/20 text-gold-300 border border-gold-500/30">
+              <i data-lucide="layers" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold gold-gradient-text">Open Position Exposure Limits</h3>
+              <p class="text-[10px] text-slate-400">Strict cap on concurrently open positions</p>
+            </div>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
+              <span class="text-xs text-slate-300 font-medium">Max Open Positions per Single Asset</span>
+              <span class="text-base font-extrabold text-gold-300">5 Positions</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
+              <span class="text-xs text-slate-300 font-medium">Max Total Open Positions across Account</span>
+              <span class="text-base font-extrabold text-gold-300">13 Positions</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Account Quantity Limits -->
+        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
+          <div class="flex items-center space-x-3">
+            <div class="p-2 rounded-xl bg-gold-500/20 text-gold-300 border border-gold-500/30">
+              <i data-lucide="users" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold gold-gradient-text">Trader Account Quantity Limits</h3>
+              <p class="text-[10px] text-slate-400">Per individual trader / IP / household</p>
+            </div>
+          </div>
+
+          <div class="space-y-3 pt-2">
+            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
+              <span class="text-xs text-slate-300 font-medium">Max Challenge Accounts Active</span>
+              <span class="text-base font-extrabold text-gold-300">4 Accounts</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
+              <span class="text-xs text-slate-300 font-medium">Max Funded / Live Accounts Active</span>
+              <span class="text-base font-extrabold text-gold-300">1 Account</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-[#062c21] border-t border-gold-500/20 py-4 px-4 text-center text-xs text-slate-400">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
+      <div class="flex items-center space-x-2">
+        <span class="font-bold text-gold-400">HerConsolidation</span>
+        <span>&copy; 2026. All Rights Reserved.</span>
+      </div>
+      <div class="text-[11px] text-slate-400">
+        Risk Warning: Trading synthetic indices and financial instruments carries significant risk. Always monitor lot scaling limits.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic JS -->
+  <script>
+    // State Store
+    const state = {
+      accountBalance: 100000,
+      challengeType: '1step', // '1step', '2step', 'payout'
+      profitTargetPercent: 10,
+      hasConsistencyAddon: false,
+      dailyProfits: [2000, 1500, 1000],
+      riskMode: 'percent', // 'percent' or 'amount'
+      riskPercent: 1,
+      riskAmount: 1000,
+      stopLossTicks: 500,
+      tickValue: 0.0005,
+      currentAsset: 'vol25'
+    };
+
+    // HerConsolidation Volatility 25 Lot Table
+    const HerConsolidationLotTable = {
+      5000: 1.92,
+      10000: 3.84,
+      25000: 9.60,
+      50000: 19.20,
+      100000: 38.40,
+      200000: 76.80
+    };
+
+    // Initialize Lucide Icons
+    window.onload = function() {
+      lucide.createIcons();
+      updateAccountUI();
+      calculateConsistency();
+      calculatePositionSize();
+    };
+
+    // Navigation Tabs
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`tab-${tabId}-content`).classList.remove('hidden');
+
+      const tabs = ['consistency', 'position', 'limits'];
+      tabs.forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        const mobBtn = document.getElementById(`mob-tab-${t}`);
+        if (t === tabId) {
+          btn.className = "px-3 py-1.5 rounded-lg transition-all text-gold-300 bg-emerald-800/80 border border-gold-500/40 font-bold";
+          if (mobBtn) mobBtn.className = "text-gold-300 font-bold border-b-2 border-gold-400 pb-1";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg transition-all text-slate-300 hover:text-gold-300";
+          if (mobBtn) mobBtn.className = "text-slate-400 pb-1";
         }
+      });
+    }
 
-        // Manual Risk Position Sizing Functions
-        function setRiskPct(pct) {
-            document.getElementById('riskPctInput').value = pct;
-            calculateManualRisk();
+    // Account Presets
+    function setAccountSize(size) {
+      state.accountBalance = size;
+      document.getElementById('customBalanceWrapper').classList.add('hidden');
+      
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        if (parseInt(btn.getAttribute('data-size')) === size) {
+          btn.className = "preset-btn active px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-400 bg-gold-500/20 text-gold-300 shadow-md";
+        } else {
+          btn.className = "preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200";
         }
+      });
 
-        function setPipValue(val, label) {
-            document.getElementById('pipValueInput').value = val;
-            calculateManualRisk();
+      updateAccountUI();
+      calculateConsistency();
+      calculatePositionSize();
+    }
+
+    function toggleCustomBalanceInput() {
+      const wrapper = document.getElementById('customBalanceWrapper');
+      wrapper.classList.toggle('hidden');
+    }
+
+    function applyCustomBalance(val) {
+      const parsed = parseFloat(val);
+      if (!isNaN(parsed) && parsed > 0) {
+        state.accountBalance = parsed;
+        updateAccountUI();
+        calculateConsistency();
+        calculatePositionSize();
+      }
+    }
+
+    function updateAccountUI() {
+      document.getElementById('selectedBalanceDisplay').innerText = `$${state.accountBalance.toLocaleString('en-US')}`;
+    }
+
+    // Consistency Calculations
+    function calculateConsistency() {
+      const challengeType = document.getElementById('challengeTypeSelect').value;
+      const targetPercent = parseFloat(document.getElementById('targetPercentInput').value) || 10;
+      const hasAddon = document.getElementById('consistencyAddonCheck').checked;
+
+      state.challengeType = challengeType;
+      state.profitTargetPercent = targetPercent;
+      state.hasConsistencyAddon = hasAddon;
+
+      let maxCapRatio = 0.35; // Default 1-step or Payout
+      if (challengeType === '2step') maxCapRatio = 0.40;
+      if (hasAddon) maxCapRatio = 0.50;
+
+      const requiredTarget = state.accountBalance * (targetPercent / 100);
+      document.getElementById('requiredTargetAmount').innerText = `$${requiredTarget.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+      const maxDailyCapDollar = requiredTarget * maxCapRatio;
+      document.getElementById('maxDailyProfitCapDisplay').innerText = `$${maxDailyCapDollar.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      
+      document.getElementById('capFormulaSubtext').innerText = `${(maxCapRatio * 100).toFixed(0)}% of $${requiredTarget.toLocaleString('en-US')} Target`;
+
+      // Calculate Logged Profits Matrix
+      const totalLoggedProfit = state.dailyProfits.reduce((acc, curr) => acc + curr, 0);
+      const highestSingleDay = state.dailyProfits.length > 0 ? Math.max(...state.dailyProfits) : 0;
+      
+      document.getElementById('currentLoggedProfit').innerText = `$${totalLoggedProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      document.getElementById('highestSingleDayDisplay').innerText = `$${highestSingleDay.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+
+      const highestPercentOfTarget = requiredTarget > 0 ? (highestSingleDay / requiredTarget) * 100 : 0;
+      document.getElementById('highestSingleDayPercent').innerText = `${highestPercentOfTarget.toFixed(1)}%`;
+
+      // Payout Specific Formula: Requested = Highest Single Day / Cap Ratio
+      const payoutRow = document.getElementById('payoutCalcRow');
+      if (challengeType === 'payout') {
+        payoutRow.classList.remove('hidden');
+        const minRequiredTotalProfit = highestSingleDay / maxCapRatio;
+        document.getElementById('requiredProfitForPayout').innerText = `$${minRequiredTotalProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      } else {
+        payoutRow.classList.add('hidden');
+      }
+
+      // Check Compliance Breaches
+      let isBreached = false;
+      state.dailyProfits.forEach(dayProfit => {
+        if (dayProfit > maxDailyCapDollar) {
+          isBreached = true;
         }
+      });
 
-        function calculateManualRiskFromDollars() {
-            const riskDollars = parseFloat(document.getElementById('riskDollarsInput').value) || 0;
-            if (accountSize > 0) {
-                const riskPct = (riskDollars / accountSize) * 100;
-                document.getElementById('riskPctInput').value = riskPct.toFixed(2);
-            }
-            calculateManualRisk(false);
-        }
+      const statusBox = document.getElementById('complianceStatusBox');
+      const statusText = document.getElementById('complianceStatusText');
+      const statusDesc = document.getElementById('complianceStatusDesc');
 
-        function calculateManualRisk(updateDollarInput = true) {
-            const riskPct = parseFloat(document.getElementById('riskPctInput').value) || 0;
-            const stopLossPips = parseFloat(document.getElementById('stopLossPipsInput').value) || 1;
-            const pipValue = parseFloat(document.getElementById('pipValueInput').value) || 10;
+      if (isBreached) {
+        statusBox.className = "p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 text-center";
+        statusText.className = "text-lg font-black text-rose-300";
+        statusText.innerText = "BREACH DETECTED - CAP EXCEEDED";
+        statusDesc.innerText = "One or more single trading days exceed the maximum single-day consistency profit rule limit.";
+      } else {
+        statusBox.className = "p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 text-center";
+        statusText.className = "text-lg font-black text-emerald-300";
+        statusText.innerText = "PASSED - IN COMPLIANCE";
+        statusDesc.innerText = "All logged trading days remain within the allowable single-day consistency profit threshold.";
+      }
 
-            const riskDollars = accountSize * (riskPct / 100);
-            if (updateDollarInput) {
-                document.getElementById('riskDollarsInput').value = riskDollars.toFixed(0);
-            }
+      renderDailyTable(maxDailyCapDollar, requiredTarget);
+    }
 
-            document.getElementById('calcRiskAmountDisplay').innerText = `$${riskDollars.toLocaleString(undefined, {maximumFractionDigits: 0})} (${riskPct.toFixed(1)}%)`;
+    function addDailyProfit() {
+      const input = document.getElementById('newDayProfitInput');
+      const val = parseFloat(input.value);
+      if (!isNaN(val)) {
+        state.dailyProfits.push(val);
+        input.value = '';
+        calculateConsistency();
+      }
+    }
 
-            // Position Size Formula: Position Size (Lots) = Risk Amount ($) / (Stop Loss Pips * Pip Value per Lot)
-            const lotSize = stopLossPips > 0 && pipValue > 0 ? riskDollars / (stopLossPips * pipValue) : 0;
-            const units = lotSize * 100000;
+    function removeDailyProfit(index) {
+      state.dailyProfits.splice(index, 1);
+      calculateConsistency();
+    }
 
-            document.getElementById('recommendedLotsDisplay').innerText = lotSize.toFixed(2) + ' Lots';
-            document.getElementById('unitsDisplay').innerText = Math.round(units).toLocaleString() + ' units';
+    function clearDailyLogs() {
+      state.dailyProfits = [];
+      calculateConsistency();
+    }
 
-            // Compare against current max lot size limit
-            const asset = document.getElementById('assetSelect').value;
-            const maxAllowedLot = getMaxLotForAccount(asset, accountSize);
-            const warningBox = document.getElementById('riskCapWarning');
+    function renderDailyTable(maxCapDollar, requiredTarget) {
+      const tbody = document.getElementById('dailyProfitTableBody');
+      tbody.innerHTML = '';
 
-            if (warningBox) {
-                if (lotSize > maxAllowedLot) {
-                    warningBox.className = 'mt-2 text-[11px] p-1.5 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 text-center font-mono font-semibold';
-                    warningBox.innerText = `EXCEEDS max lot limit (${maxAllowedLot.toFixed(2)} Lots)`;
-                } else {
-                    warningBox.className = 'mt-2 text-[11px] p-1.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-center font-mono';
-                    warningBox.innerText = `Compliant with max lot limit (${maxAllowedLot.toFixed(2)} Lots)`;
-                }
-            }
-        }
+      if (state.dailyProfits.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No trading days logged yet. Add your daily results above.</td></tr>`;
+        return;
+      }
 
-        function updateCalculator() {
-            challengeType = document.getElementById('challengeTypeSelect').value;
-            addonActive = document.getElementById('addonToggle').checked;
+      state.dailyProfits.forEach((profit, idx) => {
+        const percentOfTarget = requiredTarget > 0 ? (profit / requiredTarget) * 100 : 0;
+        const isBreach = profit > maxCapDollar;
 
-            const rule = RULES[challengeType];
+        const row = document.createElement('tr');
+        row.className = "hover:bg-gold-500/5 transition-colors";
+        row.innerHTML = `
+          <td class="p-3 font-semibold">Day ${idx + 1}</td>
+          <td class="p-3 font-bold ${profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}">$${profit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          <td class="p-3 font-medium text-gold-300">${percentOfTarget.toFixed(1)}%</td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isBreach ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
+              ${isBreach ? 'Cap Breached' : 'Passed'}
+            </span>
+          </td>
+          <td class="p-3 text-right">
+            <button onclick="removeDailyProfit(${idx})" class="text-slate-400 hover:text-rose-400 p-1">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
 
-            // Update Addon badge
-            const addonBadge = document.getElementById('addonBadge');
-            if (addonBadge) {
-                if (addonActive) {
-                    addonBadge.innerText = 'Add-On Active';
-                    addonBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-                } else {
-                    addonBadge.innerText = 'Standard';
-                    addonBadge.className = 'text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700';
-                }
-            }
+      lucide.createIcons();
+    }
 
-            // Calculate Effective Cap Percentage
-            const effectiveLimitPct = addonActive ? rule.addonLimitPct : rule.defaultLimitPct;
+    // Risk & Position Sizing Calculator
+    function setRiskMode(mode) {
+      state.riskMode = mode;
+      const percentWrapper = document.getElementById('riskPercentWrapper');
+      const amountWrapper = document.getElementById('riskAmountWrapper');
+      const percentBtn = document.getElementById('riskModePercentBtn');
+      const amountBtn = document.getElementById('riskModeAmountBtn');
 
-            // Update Header Bar UI
-            const activeLimitPctElem = document.getElementById('activeLimitPct');
-            if (activeLimitPctElem) activeLimitPctElem.innerText = (effectiveLimitPct * 100) + '%';
-            const limitBarElem = document.getElementById('limitBar');
-            if (limitBarElem) limitBarElem.style.width = (effectiveLimitPct * 100) + '%';
-            const challengeDescElem = document.getElementById('challengeTypeDesc');
-            if (challengeDescElem) challengeDescElem.innerText = rule.desc;
+      if (mode === 'percent') {
+        percentWrapper.classList.remove('hidden');
+        amountWrapper.classList.add('hidden');
+        percentBtn.className = "p-2 rounded-xl border border-gold-400 bg-gold-500/20 text-gold-300 font-bold text-center";
+        amountBtn.className = "p-2 rounded-xl border border-gold-500/20 bg-emerald-950 text-slate-300 font-bold text-center";
+      } else {
+        percentWrapper.classList.add('hidden');
+        amountWrapper.classList.remove('hidden');
+        amountBtn.className = "p-2 rounded-xl border border-gold-400 bg-gold-500/20 text-gold-300 font-bold text-center";
+        percentBtn.className = "p-2 rounded-xl border border-gold-500/20 bg-emerald-950 text-slate-300 font-bold text-center";
+      }
+      calculatePositionSize();
+    }
 
-            if (challengeType === 'funded') {
-                const formulaElem = document.getElementById('activeLimitFormula');
-                if (formulaElem) formulaElem.innerText = 'Payout × ' + (effectiveLimitPct * 100) + '%';
-                document.getElementById('challengeSection').classList.add('hidden');
-                document.getElementById('fundedSection').classList.remove('hidden');
-                calculatePayoutConsistency();
-            } else {
-                const formulaElem = document.getElementById('activeLimitFormula');
-                if (formulaElem) formulaElem.innerText = 'Target × ' + (effectiveLimitPct * 100) + '%';
-                document.getElementById('challengeSection').classList.remove('hidden');
-                document.getElementById('fundedSection').classList.add('hidden');
+    function handleAssetChange() {
+      const asset = document.getElementById('assetSelect').value;
+      const tickInput = document.getElementById('tickValueInput');
+      const assetNote = document.getElementById('assetNote');
 
-                // Compute Challenge Metrics
-                const profitTarget = accountSize * rule.targetPct;
-                const maxDayProfit = profitTarget * effectiveLimitPct;
+      state.currentAsset = asset;
 
-                document.getElementById('calcProfitTarget').innerText = '$' + profitTarget.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2});
-                document.getElementById('calcTargetPct').innerText = '(' + (rule.targetPct * 100) + '%)';
-                document.getElementById('calcMaxDayProfit').innerText = '$' + maxDayProfit.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2});
-                document.getElementById('calcMaxDayPct').innerText = '(' + (effectiveLimitPct * 100) + '% of Target)';
+      if (asset === 'vol25') {
+        tickInput.value = 0.0005;
+        assetNote.innerText = "Specialized Deriv Volatility 25: $0.0005 per tick / 0.5 unit change.";
+      } else if (asset === 'forex') {
+        tickInput.value = 10.0;
+        assetNote.innerText = "Standard Forex Lot ($10 per pip per standard lot).";
+      } else if (asset === 'indices') {
+        tickInput.value = 1.0;
+        assetNote.innerText = "Indices standard $1 per point move per unit lot.";
+      } else {
+        tickInput.value = 1.0;
+        assetNote.innerText = "Cryptocurrency standard point value.";
+      }
+      calculatePositionSize();
+    }
 
-                testSingleDay();
-            }
+    function calculatePositionSize() {
+      const slTicks = parseFloat(document.getElementById('stopLossInput').value) || 1;
+      const tickVal = parseFloat(document.getElementById('tickValueInput').value) || 0.0005;
 
-            calculateMaxLotSize();
-            calculateManualRisk();
-            renderDailyLogs();
-            updateDynamicExample();
-        }
+      let dollarRisk = 0;
+      if (state.riskMode === 'percent') {
+        const pct = parseFloat(document.getElementById('riskPercentInput').value) || 1;
+        dollarRisk = state.accountBalance * (pct / 100);
+      } else {
+        dollarRisk = parseFloat(document.getElementById('riskAmountInput').value) || 1000;
+      }
 
-        // Section 1.2.7: Check Position Limits
-        function checkPositionLimits() {
-            const posPerAsset = parseInt(document.getElementById('posPerAssetInput').value) || 0;
-            const posTotal = parseInt(document.getElementById('posTotalInput').value) || 0;
+      // Lot Sizing Formula: Risk Amount / (SL Ticks * Tick Value)
+      const calculatedLots = dollarRisk / (slTicks * tickVal);
+      document.getElementById('calculatedLotSize').innerText = `${calculatedLots.toFixed(2)} Lots`;
 
-            const assetStatus = document.getElementById('posAssetStatus');
-            if (assetStatus) {
-                if (posPerAsset <= 5) {
-                    assetStatus.className = 'text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center';
-                    assetStatus.innerHTML = `<span>Max 5 per asset</span><strong class="font-mono">OK (${posPerAsset}/5)</strong>`;
-                } else {
-                    assetStatus.className = 'text-[11px] px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 flex justify-between items-center';
-                    assetStatus.innerHTML = `<span>Exceeds Limit!</span><strong class="font-mono">BREACH (${posPerAsset}/5)</strong>`;
-                }
-            }
+      // Get Maximum Lot Limit based on HerConsolidation Table or Auto-scale
+      let maxLots = HerConsolidationLotTable[state.accountBalance];
+      if (!maxLots) {
+        // Linear Scaling Formula based on $100k -> 38.40 lots
+        maxLots = (state.accountBalance / 100000) * 38.40;
+      }
 
-            const totalStatus = document.getElementById('posTotalStatus');
-            if (totalStatus) {
-                if (posTotal <= 13) {
-                    totalStatus.className = 'text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center';
-                    totalStatus.innerHTML = `<span>Max 13 total</span><strong class="font-mono">OK (${posTotal}/13)</strong>`;
-                } else {
-                    totalStatus.className = 'text-[11px] px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 flex justify-between items-center';
-                    totalStatus.innerHTML = `<span>Exceeds Limit!</span><strong class="font-mono">BREACH (${posTotal}/13)</strong>`;
-                }
-            }
-        }
+      document.getElementById('maxAllowedLotSize').innerText = `${maxLots.toFixed(2)} Lots`;
 
-        // Section 1.2.7: Check Account Limits
-        function checkAccountLimits() {
-            const challengeAcc = parseInt(document.getElementById('accChallengeInput').value) || 0;
-            const liveAcc = parseInt(document.getElementById('accLiveInput').value) || 0;
+      // Validate Warning
+      const warningBox = document.getElementById('lotWarningBox');
+      const warningIcon = document.getElementById('lotWarningIcon');
+      const warningTitle = document.getElementById('lotWarningTitle');
+      const warningDesc = document.getElementById('lotWarningDesc');
 
-            const chStatus = document.getElementById('accChallengeStatus');
-            if (chStatus) {
-                if (challengeAcc <= 4) {
-                    chStatus.className = 'text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center';
-                    chStatus.innerHTML = `<span>Max 4 accounts</span><strong class="font-mono">OK (${challengeAcc}/4)</strong>`;
-                } else {
-                    chStatus.className = 'text-[11px] px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 flex justify-between items-center';
-                    chStatus.innerHTML = `<span>Exceeds Limit!</span><strong class="font-mono">BREACH (${challengeAcc}/4)</strong>`;
-                }
-            }
+      if (calculatedLots > maxLots) {
+        warningBox.className = "mt-4 p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 flex items-start space-x-3";
+        warningTitle.className = "text-xs font-bold text-rose-300";
+        warningTitle.innerText = "LOT LIMIT EXCEEDED BREACH RISK";
+        warningDesc.innerText = `Calculated position (${calculatedLots.toFixed(2)} lots) exceeds HerConsolidation max allowed lot limit (${maxLots.toFixed(2)} lots) for a $${state.accountBalance.toLocaleString()} account.`;
+      } else {
+        warningBox.className = "mt-4 p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-start space-x-3";
+        warningTitle.className = "text-xs font-bold text-emerald-400";
+        warningTitle.innerText = "Position Size Within Limits";
+        warningDesc.innerText = `Calculated position (${calculatedLots.toFixed(2)} lots) is safely below the maximum allowable lot limit (${maxLots.toFixed(2)} lots).`;
+      }
+    }
 
-            const liveStatus = document.getElementById('accLiveStatus');
-            if (liveStatus) {
-                if (liveAcc <= 1) {
-                    liveStatus.className = 'text-[11px] px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex justify-between items-center';
-                    liveStatus.innerHTML = `<span>Max 1 live account</span><strong class="font-mono">OK (${liveAcc}/1)</strong>`;
-                } else {
-                    liveStatus.className = 'text-[11px] px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 flex justify-between items-center';
-                    liveStatus.innerHTML = `<span>Exceeds Limit!</span><strong class="font-mono">BREACH (${liveAcc}/1)</strong>`;
-                }
-            }
-        }
-
-        // Section 1.2.8: Calculate Maximum Lot Size for active account size
-        function getMaxLotForAccount(asset, size) {
-            if (LOT_TABLE[asset] && LOT_TABLE[asset][size]) {
-                return LOT_TABLE[asset][size];
-            }
-            // Linear scale if custom account size (e.g. 0.000384 per dollar for Volatility 25)
-            return (size * 0.000384);
-        }
-
-        function calculateMaxLotSize() {
-            const asset = document.getElementById('assetSelect').value;
-            const maxLot = getMaxLotForAccount(asset, accountSize);
-
-            document.getElementById('lotAccSizeDisplay').innerText = '$' + accountSize.toLocaleString();
-            document.getElementById('maxLotSizeDisplay').innerText = maxLot.toFixed(2) + ' Lots';
-
-            testLotCompliance();
-        }
-
-        function testLotCompliance() {
-            const asset = document.getElementById('assetSelect').value;
-            const maxLot = getMaxLotForAccount(asset, accountSize);
-            const plannedLot = parseFloat(document.getElementById('testLotInput').value) || 0;
-
-            const compRes = document.getElementById('lotComplianceResult');
-            const usagePct = maxLot > 0 ? (plannedLot / maxLot) * 100 : 0;
-
-            if (compRes) {
-                if (plannedLot <= maxLot) {
-                    compRes.className = 'p-2 rounded border text-xs flex items-center justify-between bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                    compRes.innerHTML = `<span class="flex items-center gap-1"><i data-lucide="check-circle" class="w-3.5 h-3.5"></i> Within Limit</span><span id="lotUsagePct" class="font-mono text-[11px]">${usagePct.toFixed(1)}% of max</span>`;
-                } else {
-                    compRes.className = 'p-2 rounded border text-xs flex items-center justify-between bg-rose-500/10 text-rose-400 border-rose-500/30';
-                    compRes.innerHTML = `<span class="flex items-center gap-1"><i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i> Exceeds Max Lot</span><span id="lotUsagePct" class="font-mono text-[11px]">${usagePct.toFixed(1)}% of max</span>`;
-                }
-            }
-
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
-
-        // Test single day input for challenge mode
-        function testSingleDay() {
-            if (challengeType === 'funded') return;
-
-            const inputElem = document.getElementById('quickTestProfit');
-            if (!inputElem) return;
-
-            const inputVal = parseFloat(inputElem.value) || 0;
-            const rule = RULES[challengeType];
-            const effectiveLimitPct = addonActive ? rule.addonLimitPct : rule.defaultLimitPct;
-            const profitTarget = accountSize * rule.targetPct;
-            const maxDayProfit = profitTarget * effectiveLimitPct;
-
-            const sharePct = profitTarget > 0 ? (inputVal / profitTarget) * 100 : 0;
-            const quickRes = document.getElementById('quickTestResult');
-
-            if (quickRes) {
-                if (inputVal <= maxDayProfit) {
-                    quickRes.className = 'p-2.5 rounded border text-xs font-medium flex items-center justify-between bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
-                    quickRes.innerHTML = `
-                        <span class="flex items-center gap-1.5"><i data-lucide="check-circle-2" class="w-4 h-4"></i> Within Limit</span>
-                        <span id="quickTestShare" class="font-mono">${sharePct.toFixed(1)}% of target</span>
-                    `;
-                } else {
-                    quickRes.className = 'p-2.5 rounded border text-xs font-medium flex items-center justify-between bg-rose-500/10 text-rose-400 border-rose-500/30';
-                    quickRes.innerHTML = `
-                        <span class="flex items-center gap-1.5"><i data-lucide="alert-octagon" class="w-4 h-4"></i> Exceeds Consistency</span>
-                        <span id="quickTestShare" class="font-mono">${sharePct.toFixed(1)}% of target</span>
-                    `;
-                }
-            }
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
-
-        // Funded Phase Calculation Logic
-        function calculatePayoutConsistency() {
-            const payoutReq = parseFloat(document.getElementById('payoutRequestInput').value) || 0;
-            const highestDay = parseFloat(document.getElementById('highestDayInput').value) || 0;
-
-            const rule = RULES['funded'];
-            const effectiveLimitPct = addonActive ? rule.addonLimitPct : rule.defaultLimitPct;
-
-            const maxAllowedDay = payoutReq * effectiveLimitPct;
-            const shareOfReq = payoutReq > 0 ? (highestDay / payoutReq) * 100 : 0;
-
-            document.getElementById('fundedMaxAllowed').innerText = '$' + maxAllowedDay.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2});
-            document.getElementById('fundedHighestShare').innerText = shareOfReq.toFixed(1) + '%';
-
-            const statusBox = document.getElementById('payoutStatusBox');
-            const statusIcon = document.getElementById('payoutStatusIcon');
-            const statusTitle = document.getElementById('payoutStatusTitle');
-            const statusDesc = document.getElementById('payoutStatusDesc');
-            const statusBadge = document.getElementById('payoutStatusBadge');
-            const detailsBox = document.getElementById('payoutCorrectionDetails');
-
-            if (highestDay <= maxAllowedDay) {
-                // Compliant
-                statusBox.className = 'p-4 rounded-xl border transition-all duration-300 space-y-3 bg-emerald-500/10 border-emerald-500/30 text-emerald-300';
-                statusIcon.className = 'p-2 rounded-lg bg-emerald-500/20 text-emerald-400';
-                statusIcon.innerHTML = '<i data-lucide="check-circle-2" class="w-5 h-5"></i>';
-                statusTitle.innerText = 'Payout Request Approved';
-                statusDesc.innerText = `Highest daily profit ($${highestDay.toLocaleString()}) is within the permitted cap of ${effectiveLimitPct * 100}%.`;
-                statusBadge.innerText = 'Approved';
-                statusBadge.className = 'text-xs font-bold uppercase px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40';
-                
-                detailsBox.classList.add('hidden');
-            } else {
-                // Non-compliant / Exceeds Limit
-                statusBox.className = 'p-4 rounded-xl border transition-all duration-300 space-y-3 bg-amber-500/10 border-amber-500/30 text-amber-300';
-                statusIcon.className = 'p-2 rounded-lg bg-amber-500/20 text-amber-400';
-                statusIcon.innerHTML = '<i data-lucide="alert-triangle" class="w-5 h-5"></i>';
-                statusTitle.innerText = 'Payout Limit Exceeded';
-                statusDesc.innerText = `Highest single daily profit ($${highestDay.toLocaleString()}) exceeds the allowed limit of $${maxAllowedDay.toLocaleString()}.`;
-                statusBadge.innerText = 'Needs More Profit';
-                statusBadge.className = 'text-xs font-bold uppercase px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40';
-
-                // Calculate required target payout
-                const reqTarget = highestDay / effectiveLimitPct;
-                const addProfit = reqTarget - payoutReq;
-
-                document.getElementById('reqPayoutTarget').innerText = '$' + reqTarget.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-                document.getElementById('reqAdditionalProfit').innerText = '+$' + addProfit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
-
-                detailsBox.classList.remove('hidden');
-            }
-            lucide.createIcons();
-        }
-
-        // Multi-Day Simulator Log Management
-        function addDailyRow() {
-            const nextDay = dailyLogs.length + 1;
-            dailyLogs.push({ day: nextDay, profit: 1000 });
-            renderDailyLogs();
-        }
-
-        function removeDailyRow(index) {
-            dailyLogs.splice(index, 1);
-            // Re-index days
-            dailyLogs.forEach((item, idx) => item.day = idx + 1);
-            renderDailyLogs();
-        }
-
-        function updateDailyProfit(index, val) {
-            dailyLogs[index].profit = parseFloat(val) || 0;
-            renderDailyLogs();
-        }
-
-        function clearDailyLogs() {
-            dailyLogs = [];
-            renderDailyLogs();
-        }
-
-        function renderDailyLogs() {
-            const tbody = document.getElementById('dailyLogTbody');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-
-            const rule = RULES[challengeType];
-            const effectiveLimitPct = addonActive ? rule.addonLimitPct : rule.defaultLimitPct;
-
-            let targetBase = 0;
-            if (challengeType === 'funded') {
-                targetBase = parseFloat(document.getElementById('payoutRequestInput').value) || 0;
-            } else {
-                targetBase = accountSize * rule.targetPct;
-            }
-
-            const maxAllowedSingleDay = targetBase * effectiveLimitPct;
-            let totalProfit = 0;
-            let highestDayVal = 0;
-            let breachCount = 0;
-
-            dailyLogs.forEach((item, index) => {
-                totalProfit += item.profit;
-                if (item.profit > highestDayVal) highestDayVal = item.profit;
-
-                const sharePct = targetBase > 0 ? (item.profit / targetBase) * 100 : 0;
-                const isBreached = item.profit > maxAllowedSingleDay;
-                if (isBreached) breachCount++;
-
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/40 transition';
-                tr.innerHTML = `
-                    <td class="p-2.5 font-medium text-slate-300">Day ${item.day}</td>
-                    <td class="p-2.5">
-                        <input type="number" value="${item.profit}" onchange="updateDailyProfit(${index}, this.value)"
-                            class="w-28 px-2 py-1 bg-slate-950 border border-slate-700 rounded text-white font-mono text-xs focus:outline-none focus:border-brand-500">
-                    </td>
-                    <td class="p-2.5 text-center font-mono ${sharePct > (effectiveLimitPct * 100) ? 'text-rose-400 font-bold' : 'text-slate-300'}">
-                        ${sharePct.toFixed(1)}%
-                    </td>
-                    <td class="p-2.5 text-center">
-                        ${isBreached ? 
-                            `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30">Exceeds Cap</span>` : 
-                            `<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">OK</span>`}
-                    </td>
-                    <td class="p-2.5 text-right">
-                        <button onclick="removeDailyRow(${index})" class="text-slate-500 hover:text-rose-400 transition p-1">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-
-            // Update Progress Summary
-            const totalProfitElem = document.getElementById('logTotalProfit');
-            if (totalProfitElem) totalProfitElem.innerText = '$' + totalProfit.toLocaleString(undefined, {minimumFractionDigits: 0, maximumFractionDigits: 2});
-            const highestDayElem = document.getElementById('logHighestDaySummary');
-            if (highestDayElem) highestDayElem.innerText = 'Highest Day: $' + highestDayVal.toLocaleString();
-
-            const progressPct = targetBase > 0 ? Math.min((totalProfit / targetBase) * 100, 100) : 0;
-            const logProgressElem = document.getElementById('logProgressBar');
-            if (logProgressElem) logProgressElem.style.width = progressPct + '%';
-            const logProgressPctElem = document.getElementById('logProgressPct');
-            if (logProgressPctElem) logProgressPctElem.innerText = progressPct.toFixed(1) + '% of target accumulated';
-
-            // Sequence Banner Alert
-            const banner = document.getElementById('sequenceStatusBanner');
-            if (banner) {
-                if (dailyLogs.length === 0) {
-                    banner.className = 'p-3 rounded-lg text-xs flex items-center justify-between border bg-slate-950 border-slate-800 text-slate-400';
-                    banner.innerHTML = `<span class="flex items-center gap-2"><i data-lucide="info" class="w-4 h-4"></i> Add trading days to simulate multi-day sequence compliance.</span>`;
-                } else if (breachCount > 0) {
-                    banner.className = 'p-3 rounded-lg text-xs flex items-center justify-between border bg-rose-500/10 border-rose-500/30 text-rose-300';
-                    banner.innerHTML = `<span class="flex items-center gap-2 font-semibold"><i data-lucide="alert-octagon" class="w-4 h-4 text-rose-400"></i> Non-Compliant Sequence: ${breachCount} trading day(s) exceed the ${effectiveLimitPct * 100}% cap.</span>`;
-                } else if (totalProfit >= targetBase) {
-                    banner.className = 'p-3 rounded-lg text-xs flex items-center justify-between border bg-emerald-500/10 border-emerald-500/30 text-emerald-300';
-                    banner.innerHTML = `<span class="flex items-center gap-2 font-semibold"><i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> Target Reached & Fully Compliant! Sequence passes all consistency rules.</span>`;
-                } else {
-                    banner.className = 'p-3 rounded-lg text-xs flex items-center justify-between border bg-blue-500/10 border-blue-500/30 text-blue-300';
-                    banner.innerHTML = `<span class="flex items-center gap-2"><i data-lucide="shield-check" class="w-4 h-4 text-blue-400"></i> Sequence Compliant so far. Need $${(targetBase - totalProfit).toLocaleString()} more profit to hit target.</span>`;
-                }
-            }
-
-            if (window.lucide) {
-                lucide.createIcons();
-            }
-        }
-
-        // Dynamic Example Walkthrough Text Generator
-        function updateDynamicExample() {
-            const rule = RULES[challengeType];
-            const effectiveLimitPct = addonActive ? rule.addonLimitPct : rule.defaultLimitPct;
-            const exContainer = document.getElementById('exampleBox');
-            if (!exContainer) return;
-
-            if (challengeType === 'funded') {
-                const payoutReq = parseFloat(document.getElementById('payoutRequestInput').value) || 4000;
-                const maxAllowed = payoutReq * effectiveLimitPct;
-                exContainer.innerHTML = `
-                    <p>For a requested payout of <strong class="text-white">$${payoutReq.toLocaleString()}</strong> under the <strong>${effectiveLimitPct * 100}%</strong> consistency limit:</p>
-                    <ul class="list-disc pl-4 space-y-1 text-slate-400">
-                        <li>Maximum single profitable day permitted = <strong class="text-amber-400">$${maxAllowed.toLocaleString()}</strong>.</li>
-                        <li>If your highest day is <strong>$1,200</strong> &rarr; Approved!</li>
-                        <li>If your highest day is <strong>$1,800</strong> &rarr; Needs more profit! Target = $1,800 / ${effectiveLimitPct} = <strong class="text-emerald-400">$${(1800/effectiveLimitPct).toLocaleString()}</strong> total payout requirement.</li>
-                    </ul>
-                `;
-            } else {
-                const target = accountSize * rule.targetPct;
-                const maxAllowed = target * effectiveLimitPct;
-                exContainer.innerHTML = `
-                    <p>For a <strong class="text-white">$${accountSize.toLocaleString()}</strong> account on <strong>${rule.name}</strong>:</p>
-                    <ul class="list-disc pl-4 space-y-1 text-slate-400">
-                        <li>Profit Target (${rule.targetPct * 100}%) = <strong class="text-white">$${target.toLocaleString()}</strong>.</li>
-                        <li>Consistency Cap (${effectiveLimitPct * 100}%) = <strong class="text-amber-400">$${maxAllowed.toLocaleString()}</strong> per trading day.</li>
-                        <li>If Day 1 profit is $3,000, and cap is $2,800 &rarr; Breach! Account fails consistency.</li>
-                        <li>Keep all daily gains under <strong class="text-emerald-400">$${maxAllowed.toLocaleString()}</strong> while reaching $${target.toLocaleString()}.</li>
-                    </ul>
-                `;
-            }
-        }
-    </script>
+    // Light / Dark Theme Switcher
+    function toggleTheme() {
+      const html = document.documentElement;
+      const themeIcon = document.getElementById('themeIcon');
+      
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        document.body.className = "bg-slate-100 text-slate-900 min-h-screen transition-colors duration-300 flex flex-col justify-between";
+      } else {
+        html.classList.add('dark');
+        document.body.className = "bg-[#041f17] dark:bg-[#041f17] text-slate-100 min-h-screen transition-colors duration-300 flex flex-col justify-between";
+      }
+    }
+  </script>
 </body>
 </html>
