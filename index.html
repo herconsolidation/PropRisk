@@ -1,770 +1,2101 @@
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HerConsolidation Risk & Consistency Calculator</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>h.co | Prop Firm Risk & Consistency Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/lucide@latest"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
       theme: {
         extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+          },
           colors: {
-            emerald: {
-              950: '#041f17',
-              900: '#062c21',
-              800: '#0b3c2d',
-              700: '#11523f',
+            hcEmerald: {
+              950: '#03170f',
+              900: '#052418',
+              850: '#072d1e',
+              800: '#093624',
+              700: '#0e4d34',
+              600: '#146646',
             },
-            gold: {
-              300: '#f3e5ab',
-              400: '#e6ca65',
+            hcGold: {
+              200: '#faecc0',
+              300: '#f5dc8e',
+              400: '#e8c24e',
               500: '#d4af37',
-              600: '#b8860b',
-              700: '#8c6507',
-            }
-          }
-        }
-      }
-    }
+              600: '#b08d26',
+              700: '#856817',
+            },
+          },
+        },
+      },
+    };
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
-    body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    :root {
+      color-scheme: dark;
     }
-    
-    .gold-gradient-text {
-      background: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #b8860b 100%);
+
+    html:not(.dark) {
+      color-scheme: light;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Gold shimmer accent text */
+    .hc-gold-text {
+      background: linear-gradient(125deg, #faecc0 0%, #e8c24e 45%, #d4af37 72%, #b08d26 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .gold-border-gradient {
-      border-image: linear-gradient(135deg, #d4af37, #8c6507) 1;
+    html:not(.dark) .hc-gold-text {
+      background: linear-gradient(125deg, #8f6d13 0%, #b08d26 50%, #6d5109 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
-    .emerald-glow {
-      box-shadow: 0 0 25px -5px rgba(13, 148, 136, 0.25);
+    /* Subtle emerald + gold card surface */
+    .hc-card {
+      background-color: #093624;
+      border: 1px solid rgba(212, 175, 55, 0.24);
+      box-shadow: 0 12px 30px -12px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(245, 220, 142, 0.08);
+      transition: background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.2s ease;
     }
 
-    .gold-glow {
-      box-shadow: 0 0 20px -3px rgba(212, 175, 55, 0.25);
+    html:not(.dark) .hc-card {
+      background-color: #ffffff;
+      border: 1px solid rgba(176, 138, 30, 0.28);
+      box-shadow: 0 10px 25px -10px rgba(9, 54, 36, 0.09), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .hc-subcard {
+      background-color: #052418;
+      border: 1px solid rgba(212, 175, 55, 0.18);
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    html:not(.dark) .hc-subcard {
+      background-color: #f4f8f6;
+      border: 1px solid rgba(176, 138, 30, 0.22);
+    }
+
+    .hc-input {
+      background-color: #03170f;
+      border: 1px solid rgba(212, 175, 55, 0.32);
+      color: #f8fafc;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+    }
+
+    .hc-input:focus {
+      outline: none;
+      border-color: #e8c24e;
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+    }
+
+    html:not(.dark) .hc-input {
+      background-color: #ffffff;
+      border: 1px solid rgba(14, 77, 52, 0.25);
+      color: #062418;
+    }
+
+    html:not(.dark) .hc-input:focus {
+      border-color: #b08d26;
+      box-shadow: 0 0 0 3px rgba(176, 141, 38, 0.16);
+    }
+
+    .hc-btn-gold {
+      background: linear-gradient(135deg, #f3d26b 0%, #d4af37 55%, #b08d26 100%);
+      color: #041d13;
+      font-weight: 700;
+      box-shadow: 0 4px 14px -2px rgba(212, 175, 55, 0.35);
+      transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
+    }
+
+    .hc-btn-gold:hover {
+      filter: brightness(1.06);
+      box-shadow: 0 6px 18px -2px rgba(212, 175, 55, 0.5);
+    }
+
+    .hc-btn-gold:active {
+      transform: scale(0.98);
+    }
+
+    /* Custom scrollbars */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(5, 36, 24, 0.5);
+    }
+    html:not(.dark) ::-webkit-scrollbar-track {
+      background: #eef4f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.38);
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(212, 175, 55, 0.6);
+    }
+
+    /* Custom range slider styling */
+    input[type="range"].hc-slider {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 7px;
+      border-radius: 999px;
+      background: rgba(212, 175, 55, 0.22);
+      outline: none;
+    }
+    input[type="range"].hc-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f3d26b, #b08d26);
+      border: 2px solid #052418;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+    }
+    html:not(.dark) input[type="range"].hc-slider::-webkit-slider-thumb {
+      border: 2px solid #ffffff;
     }
   </style>
 </head>
-<body class="bg-[#041f17] dark:bg-[#041f17] text-slate-100 min-h-screen transition-colors duration-300 flex flex-col justify-between">
 
-  <!-- Header / Navigation -->
-  <header class="sticky top-0 z-50 bg-[#062c21]/90 dark:bg-[#062c21]/90 backdrop-blur-md border-b border-gold-500/30 px-4 py-3">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      <!-- Logo Branding -->
-      <div class="flex items-center space-x-3">
-        <div class="relative w-12 h-12 rounded-xl bg-gradient-to-br from-gold-400 via-gold-500 to-gold-700 p-[2px] shadow-lg flex items-center justify-center overflow-hidden">
-          <div class="w-full h-full bg-[#041f17] rounded-[10px] flex items-center justify-center p-1">
-            <!-- Brand Logo image or SVG Badge rendering provided logo concept -->
-            <img 
-              src="https://placehold.co/100x100/062c21/d4af37?text=BLOOM" 
-              onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\' fill=\'%23d4af37\'><circle cx=\'50\' cy=\'50\' r=\'40\' stroke=\'%23d4af37\' stroke-width=\'4\' fill=\'%23062c21\'/><text x=\'50%\' y=\'55%\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-weight=\'bold\' font-size=\'20\' fill=\'%23f3e5ab\'>BF</text></svg>'" 
-              alt="HerConsolidation Logo" 
-              class="w-full h-full object-cover rounded-md" 
-            />
-          </div>
-        </div>
-        <div>
-          <h1 class="text-xl font-bold tracking-tight gold-gradient-text">HerConsolidation</h1>
-          <p class="text-xs text-gold-300/70 font-medium">Risk & Consistency Intelligence Hub</p>
-        </div>
-      </div>
+<body class="bg-hcEmerald-900 text-slate-100 dark:bg-hcEmerald-900 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-300">
 
-      <!-- Navigation Tabs & Theme Switcher -->
-      <div class="flex items-center space-x-3">
-        <nav class="hidden md:flex space-x-1 bg-[#041f17]/80 p-1 rounded-xl border border-gold-500/20 text-xs font-semibold">
-          <button onclick="switchTab('consistency')" id="tab-btn-consistency" class="px-3 py-1.5 rounded-lg transition-all text-gold-300 bg-emerald-800/80 border border-gold-500/40">Consistency Engine</button>
-          <button onclick="switchTab('position')" id="tab-btn-position" class="px-3 py-1.5 rounded-lg transition-all text-slate-300 hover:text-gold-300">Risk Calculator</button>
-          <button onclick="switchTab('limits')" id="tab-btn-limits" class="px-3 py-1.5 rounded-lg transition-all text-slate-300 hover:text-gold-300">Account Rules</button>
-        </nav>
-
-        <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2 rounded-xl bg-[#08382b] border border-gold-500/30 text-gold-300 hover:bg-gold-500/10 transition-colors">
-          <i data-lucide="sun" id="themeIcon" class="w-5 h-5"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Mobile Nav Bar -->
-    <div class="md:hidden flex justify-around mt-3 pt-2 border-t border-gold-500/20 text-xs">
-      <button onclick="switchTab('consistency')" id="mob-tab-consistency" class="text-gold-300 font-bold border-b-2 border-gold-400 pb-1">Consistency</button>
-      <button onclick="switchTab('position')" id="mob-tab-position" class="text-slate-400 pb-1">Risk Calc</button>
-      <button onclick="switchTab('limits')" id="mob-tab-limits" class="text-slate-400 pb-1">Rules</button>
-    </div>
-  </header>
-
-  <!-- Main Content Body -->
-  <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
-
-    <!-- Account Preset Selection Bar -->
-    <section class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 shadow-xl">
-      <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
-        <div class="flex items-center space-x-3 w-full lg:w-auto">
-          <div class="p-2.5 rounded-xl bg-emerald-950 border border-gold-500/40 text-gold-400">
-            <i data-lucide="wallet" class="w-5 h-5"></i>
-          </div>
-          <div>
-            <span class="text-xs font-semibold text-gold-300/80 uppercase tracking-wider">Select Account Size</span>
-            <div class="flex items-center space-x-2">
-              <span id="selectedBalanceDisplay" class="text-xl font-extrabold text-white">$100,000</span>
-              <span id="accountTypeBadge" class="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-md bg-gold-500/20 text-gold-300 border border-gold-500/30">1-Step Challenge</span>
+  <!-- TOP HEADER WITH h.co LOGO, QUICK CONTROLS & THEME TOGGLE -->
+  <header id="appHeader" class="sticky top-0 z-40 bg-hcEmerald-950/90 dark:bg-hcEmerald-950/90 backdrop-blur-md border-b border-hcGold-500/25 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- h.co Luxury Monogram Badge + Title -->
+        <div class="flex items-center gap-3.5">
+          <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-hcGold-300 via-hcGold-500 to-hcGold-700 p-[2px] shadow-lg shrink-0">
+            <div class="w-full h-full rounded-[14px] bg-hcEmerald-950 flex items-center justify-center relative overflow-hidden">
+              <!-- Stylized h.co SVG Badge -->
+              <svg viewBox="0 0 80 80" class="w-10 h-10" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="h.co monogram">
+                <defs>
+                  <linearGradient id="hcGoldGrad" x1="10" y1="10" x2="70" y2="70" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#faecc0" />
+                    <stop offset="50%" stop-color="#e8c24e" />
+                    <stop offset="100%" stop-color="#b08d26" />
+                  </linearGradient>
+                </defs>
+                <path d="M18 54 C22 36, 26 20, 29 17 C31 15, 33 17, 30 27 L25 44 C29 36, 35 32, 39 34 C42 36, 40 45, 37 54" stroke="url(#hcGoldGrad)" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" />
+                <circle cx="44.5" cy="53" r="2.3" fill="url(#hcGoldGrad)" />
+                <path d="M58 37 C54 34, 48 37, 47 45 C46 52, 52 55, 58 51" stroke="url(#hcGoldGrad)" stroke-width="3.4" stroke-linecap="round" />
+                <path d="M59 42 C63 40, 67 43, 66 49 C65 53, 61 54, 59 51" stroke="url(#hcGoldGrad)" stroke-width="2.8" stroke-linecap="round" />
+                <path d="M22 61 C36 67, 58 66, 65 56" stroke="url(#hcGoldGrad)" stroke-width="2.2" stroke-linecap="round" />
+              </svg>
             </div>
           </div>
+
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-lg sm:text-xl font-extrabold tracking-tight hc-gold-text">h.co Risk & Consistency</span>
+              <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-hcGold-500/15 text-hcGold-300 border border-hcGold-500/30">
+                Prop Terminal
+              </span>
+            </div>
+            <p id="headerSubtitle" class="text-xs text-slate-300/80 dark:text-slate-300/80">
+              Consistency Rules • Position & Account Limits • 40-Asset Lot Matrix • Manual Sizing
+            </p>
+          </div>
         </div>
 
-        <!-- Account Size Buttons -->
-        <div class="flex flex-wrap gap-2 w-full lg:w-auto justify-start lg:justify-end">
-          <button onclick="setAccountSize(5000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="5000">$5k</button>
-          <button onclick="setAccountSize(10000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="10000">$10k</button>
-          <button onclick="setAccountSize(25000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="25000">$25k</button>
-          <button onclick="setAccountSize(50000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="50000">$50k</button>
-          <button onclick="setAccountSize(100000)" class="preset-btn active px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-400 bg-gold-500/20 text-gold-300 shadow-md" data-size="100000">$100k</button>
-          <button onclick="setAccountSize(200000)" class="preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200" data-size="200000">$200k</button>
-          <button onclick="toggleCustomBalanceInput()" class="px-3.5 py-1.5 rounded-xl border border-gold-500/30 bg-emerald-950 text-gold-400 hover:bg-gold-500/10 text-xs font-bold transition-all flex items-center space-x-1">
-            <i data-lucide="sliders" class="w-3.5 h-3.5"></i>
-            <span>Custom</span>
+        <!-- Right Quick Controls & Theme Toggle -->
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-xl hc-subcard text-xs">
+            <span class="text-slate-400">Active Capital:</span>
+            <span id="headerBalancePill" class="font-bold font-mono text-hcGold-300">$100,000</span>
+            <span class="text-hcGold-500/40">|</span>
+            <span id="headerModelPill" class="font-semibold text-emerald-300">1-Step (35%)</span>
+          </div>
+
+          <button
+            type="button"
+            id="themeToggleBtn"
+            onclick="toggleTheme()"
+            class="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold border border-hcGold-500/35 bg-hcEmerald-800/80 hover:bg-hcEmerald-700/80 text-hcGold-200 transition-all cursor-pointer"
+            aria-label="Toggle Dark or Light Theme"
+          >
+            <span id="themeIcon" class="text-sm leading-none">☀️</span>
+            <span id="themeLabel">Light Mode</span>
           </button>
         </div>
       </div>
 
-      <!-- Custom Capital Input -->
-      <div id="customBalanceWrapper" class="hidden mt-4 pt-3 border-t border-gold-500/20 flex items-center space-x-3">
-        <label class="text-xs font-medium text-gold-300">Custom Account Equity ($):</label>
-        <input type="number" id="customBalanceInput" value="150000" oninput="applyCustomBalance(this.value)" class="w-48 bg-emerald-950 border border-gold-500/40 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-gold-400">
+      <!-- Primary Section Navigation Tabs -->
+      <nav class="mt-3 pt-2.5 border-t border-hcGold-500/15 flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-0.5" aria-label="Calculator sections">
+        <button
+          type="button"
+          id="nav-consistency"
+          onclick="switchSection('consistency')"
+          class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer hc-btn-gold"
+        >
+          1. Consistency & Profit Target
+        </button>
+        <button
+          type="button"
+          id="nav-limits"
+          onclick="switchSection('limits')"
+          class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer hc-subcard text-slate-200 hover:border-hcGold-400/50"
+        >
+          2. Position & Account Limits
+        </button>
+        <button
+          type="button"
+          id="nav-lots"
+          onclick="switchSection('lots')"
+          class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer hc-subcard text-slate-200 hover:border-hcGold-400/50"
+        >
+          3. 40-Asset Max Lot Table
+        </button>
+        <button
+          type="button"
+          id="nav-manual"
+          onclick="switchSection('manual')"
+          class="nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer hc-subcard text-slate-200 hover:border-hcGold-400/50"
+        >
+          4. Manual Risk Calculator
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-grow">
+
+    <!-- GLOBAL ACCOUNT CAPITAL SELECTOR BAR -->
+    <section class="hc-card rounded-2xl p-4 sm:p-5">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-wider text-hcGold-400">Account Equity & Sizing Base</p>
+          <div class="flex flex-wrap items-baseline gap-2.5 mt-1">
+            <span id="globalBalanceDisplay" class="text-2xl sm:text-3xl font-extrabold font-mono tracking-tight hc-gold-text">$100,000</span>
+            <span id="globalBalanceNote" class="text-xs text-slate-300/80">Standard $100k evaluation / funded capital</span>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button type="button" onclick="setGlobalBalance(5000)" data-bal="5000" class="bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-all">$5k</button>
+          <button type="button" onclick="setGlobalBalance(10000)" data-bal="10000" class="bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-all">$10k</button>
+          <button type="button" onclick="setGlobalBalance(25000)" data-bal="25000" class="bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-all">$25k</button>
+          <button type="button" onclick="setGlobalBalance(50000)" data-bal="50000" class="bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-all">$50k</button>
+          <button type="button" onclick="setGlobalBalance(100000)" data-bal="100000" class="bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-400 bg-hcGold-500/20 text-hcGold-300 cursor-pointer transition-all">$100k</button>
+          <button type="button" onclick="setGlobalBalance(200000)" data-bal="200000" class="bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-all">$200k</button>
+
+          <div class="flex items-center gap-1.5 pl-1">
+            <span class="text-xs font-semibold text-hcGold-400">$</span>
+            <input
+              type="number"
+              id="customBalanceInput"
+              min="100"
+              step="100"
+              value="100000"
+              oninput="handleCustomBalanceInput(this.value)"
+              aria-label="Custom Account Balance"
+              class="w-28 sm:w-32 px-2.5 py-1.5 rounded-xl text-xs font-mono font-semibold hc-input"
+            />
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- TAB 1: CONSISTENCY ENGINE -->
-    <div id="tab-consistency-content" class="tab-pane space-y-6">
-      
-      <!-- Challenge Configuration Bar -->
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
-          <div class="text-xs text-gold-300/80 font-medium mb-1">Challenge Mode</div>
-          <select id="challengeTypeSelect" onchange="calculateConsistency()" class="bg-emerald-950 border border-gold-500/40 text-slate-100 font-bold text-xs rounded-xl p-2.5 focus:outline-none focus:border-gold-400">
-            <option value="1step" selected>1-Step Challenge (35% Daily Cap)</option>
-            <option value="2step">2-Step Challenge (40% Daily Cap)</option>
-            <option value="payout">Funded Payout Consistency (35% Cap)</option>
-          </select>
-        </div>
-
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
+    <!-- =====================================================================
+         SECTION 1: CONSISTENCY RULE & PROFIT TARGET ENGINE (1.2.4 & 1.2.5)
+    ====================================================================== -->
+    <section id="section-consistency" class="calc-section space-y-6">
+      <!-- Challenge Model Selector Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-3">
+        <button
+          type="button"
+          id="model-btn-1step"
+          onclick="selectChallengeModel('1step')"
+          class="model-card text-left p-4 rounded-2xl hc-card border-2 border-hcGold-400 cursor-pointer transition-all"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-xs text-gold-300/80 font-medium">Profit Target Rate</span>
-            <span id="targetPercentLabel" class="text-xs font-bold text-gold-400">10%</span>
+            <span class="text-xs font-bold uppercase tracking-wider text-hcGold-300">1-Step Challenge</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">35% Cap</span>
           </div>
-          <input type="number" id="targetPercentInput" value="10" oninput="calculateConsistency()" class="bg-emerald-950 border border-gold-500/40 text-white font-bold text-xs rounded-xl p-2.5 focus:outline-none focus:border-gold-400 mt-2">
-        </div>
+          <p class="text-lg font-extrabold font-mono mt-1.5">10% Target</p>
+          <p class="text-[11px] text-slate-300/80 mt-1">Max daily profit = 35% of profit target</p>
+        </button>
 
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
+        <button
+          type="button"
+          id="model-btn-2step-p1"
+          onclick="selectChallengeModel('2step-p1')"
+          class="model-card text-left p-4 rounded-2xl hc-card cursor-pointer transition-all"
+        >
           <div class="flex items-center justify-between">
-            <span class="text-xs text-gold-300/80 font-medium">Consistency Add-On (50%)</span>
-            <input type="checkbox" id="consistencyAddonCheck" onchange="calculateConsistency()" class="accent-gold-500 w-4 h-4 rounded cursor-pointer">
+            <span class="text-xs font-bold uppercase tracking-wider text-hcGold-300">2-Step • Phase 1</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-hcGold-500/20 text-hcGold-300 border border-hcGold-400/30">40% Cap</span>
           </div>
-          <p class="text-[10px] text-slate-400 mt-2">Overrides daily max profit cap to 50% of overall profit target or requested payout.</p>
-        </div>
+          <p class="text-lg font-extrabold font-mono mt-1.5">8% Target</p>
+          <p class="text-[11px] text-slate-300/80 mt-1">Max daily profit = 40% of Phase 1 target</p>
+        </button>
 
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-4 flex flex-col justify-between">
-          <span class="text-xs text-gold-300/80 font-medium">Max Daily Profit Cap ($)</span>
-          <div id="maxDailyProfitCapDisplay" class="text-2xl font-black text-gold-300 tracking-tight">$3,500.00</div>
-          <p id="capFormulaSubtext" class="text-[10px] text-gold-400/70">35% of $10,000 Target</p>
-        </div>
+        <button
+          type="button"
+          id="model-btn-2step-p2"
+          onclick="selectChallengeModel('2step-p2')"
+          class="model-card text-left p-4 rounded-2xl hc-card cursor-pointer transition-all"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-hcGold-300">2-Step • Phase 2</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-hcGold-500/20 text-hcGold-300 border border-hcGold-400/30">40% Cap</span>
+          </div>
+          <p class="text-lg font-extrabold font-mono mt-1.5">5% Target</p>
+          <p class="text-[11px] text-slate-300/80 mt-1">Max daily profit = 40% of Phase 2 target</p>
+        </button>
 
+        <button
+          type="button"
+          id="model-btn-funded"
+          onclick="selectChallengeModel('funded')"
+          class="model-card text-left p-4 rounded-2xl hc-card cursor-pointer transition-all"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-hcGold-300">Funded Payout</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30">35% Payout</span>
+          </div>
+          <p class="text-lg font-extrabold font-mono mt-1.5">Payout Rule</p>
+          <p class="text-[11px] text-slate-300/80 mt-1">Highest day ≤ 35% of requested payout</p>
+        </button>
+
+        <button
+          type="button"
+          id="model-btn-instant"
+          onclick="selectChallengeModel('instant')"
+          class="model-card text-left p-4 rounded-2xl hc-card opacity-85 cursor-pointer transition-all"
+        >
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-hcGold-300">Instant Challenge</span>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/25 text-slate-300 border border-slate-400/30">Soon</span>
+          </div>
+          <p class="text-lg font-extrabold mt-1.5">Coming Soon</p>
+          <p class="text-[11px] text-slate-300/80 mt-1">Preview upcoming instant model parameters</p>
+        </button>
       </div>
 
-      <!-- Main Consistency Dynamic Metrics -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Left: Summary Matrix Card -->
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
-          <div>
-            <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
-              <i data-lucide="shield-check" class="w-4 h-4 text-gold-400"></i>
-              <span>Compliance Overview</span>
-            </h3>
-            
-            <div class="mt-4 space-y-3">
-              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
-                <span class="text-slate-400">Required Profit Target</span>
-                <span id="requiredTargetAmount" class="font-bold text-white">$10,000.00</span>
-              </div>
-              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
-                <span class="text-slate-400">Current Logged Profit</span>
-                <span id="currentLoggedProfit" class="font-bold text-emerald-400">$0.00</span>
-              </div>
-              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
-                <span class="text-slate-400">Highest Single Day Profit</span>
-                <span id="highestSingleDayDisplay" class="font-bold text-gold-300">$0.00</span>
-              </div>
-              <div class="flex justify-between items-center py-2 border-b border-gold-500/10 text-xs">
-                <span class="text-slate-400">Highest Single Day % Share</span>
-                <span id="highestSingleDayPercent" class="font-bold text-gold-300">0.0%</span>
-              </div>
-              <div id="payoutCalcRow" class="hidden flex justify-between items-center py-2 border-b border-gold-500/10 text-xs bg-gold-500/10 p-2 rounded-lg">
-                <span class="text-gold-300 font-semibold">Min Profit Needed for Full Payout</span>
-                <span id="requiredProfitForPayout" class="font-extrabold text-gold-400">$0.00</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Overall Compliance Status Badge -->
-          <div id="complianceStatusBox" class="p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 text-center">
-            <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400">Status</span>
-            <div id="complianceStatusText" class="text-lg font-black text-emerald-300">PASSED - IN COMPLIANCE</div>
-            <p id="complianceStatusDesc" class="text-[11px] text-slate-300 mt-1">No trading days exceed the maximum single-day rule limit.</p>
-          </div>
+      <!-- Instant Challenge Coming Soon Banner (shown when selected) -->
+      <div id="instantComingSoonBanner" class="hidden hc-card rounded-2xl p-4 border-l-4 border-l-hcGold-400 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-bold text-hcGold-300">Instant Challenge — Coming Soon</p>
+          <p class="text-xs text-slate-300/85 mt-0.5">
+            Instant Challenge parameters are coming soon. You can still inspect baseline figures below or switch to 1-Step, 2-Step Phase 1/2, or Funded Payout mode.
+          </p>
         </div>
-
-        <!-- Right: Daily Profit Tracker & Sequence Builder -->
-        <div class="lg:col-span-2 bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
-          <div class="flex items-center justify-between">
-            <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
-              <i data-lucide="list-plus" class="w-4 h-4 text-gold-400"></i>
-              <span>Multi-Day Trading Sequence Tracker</span>
-            </h3>
-            <button onclick="clearDailyLogs()" class="text-xs text-rose-400 hover:text-rose-300 flex items-center space-x-1">
-              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-              <span>Reset Days</span>
-            </button>
-          </div>
-
-          <!-- Add Day Input Form -->
-          <div class="flex gap-2">
-            <input type="number" id="newDayProfitInput" placeholder="Enter day profit/loss ($)" class="flex-grow bg-emerald-950 border border-gold-500/40 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-gold-400">
-            <button onclick="addDailyProfit()" class="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-400 hover:to-gold-500 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs transition-all flex items-center space-x-1 shadow-md">
-              <i data-lucide="plus" class="w-4 h-4"></i>
-              <span>Add Day</span>
-            </button>
-          </div>
-
-          <!-- Log Table -->
-          <div class="overflow-x-auto max-h-64 overflow-y-auto rounded-xl border border-gold-500/20">
-            <table class="w-full text-left text-xs text-slate-300">
-              <thead class="bg-emerald-950 text-gold-300 sticky top-0 uppercase text-[10px] tracking-wider border-b border-gold-500/30">
-                <tr>
-                  <th class="p-3">Day</th>
-                  <th class="p-3">Profit / Loss</th>
-                  <th class="p-3">% of Target / Request</th>
-                  <th class="p-3">Compliance Status</th>
-                  <th class="p-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody id="dailyProfitTableBody" class="divide-y divide-gold-500/10 bg-[#041f17]/50">
-                <!-- Dynamically Inserted -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
+        <button type="button" onclick="selectChallengeModel('1step')" class="px-3.5 py-2 rounded-xl text-xs font-bold hc-btn-gold shrink-0 cursor-pointer">
+          Switch to 1-Step
+        </button>
       </div>
 
-    </div>
-
-    <!-- TAB 2: MANUAL RISK & POSITION CALCULATOR -->
-    <div id="tab-position-content" class="tab-pane hidden space-y-6">
-      
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Input Controls -->
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
-          <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
-            <i data-lucide="calculator" class="w-4 h-4 text-gold-400"></i>
-            <span>Position Risk Parameters</span>
-          </h3>
-
-          <div class="space-y-3 text-xs">
+      <!-- Main Consistency Grid: Parameters & KPIs + Funded Payout Adjuster -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 Cols: Rule Controls & Live Metrics -->
+        <div class="lg:col-span-7 hc-card rounded-2xl p-5 sm:p-6 space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <label class="text-gold-300 font-medium">Asset Class / Symbol</label>
-              <select id="assetSelect" onchange="handleAssetChange()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 text-white font-semibold rounded-xl p-2.5 focus:outline-none focus:border-gold-400">
-                <option value="vol25" selected>Deriv - Volatility 25 Index</option>
-                <option value="forex">Forex Majors (0.0001 Pip)</option>
-                <option value="indices">Indices / US30 / NAS100</option>
-                <option value="crypto">Cryptocurrency / BTCUSD</option>
-              </select>
+              <h2 id="activeModelTitle" class="text-lg sm:text-xl font-bold hc-gold-text">1-Step Challenge (10% Target • 35% Consistency)</h2>
+              <p id="activeModelFormula" class="text-xs text-slate-300/80 mt-0.5">
+                Max allowed single-day profit = 35% × Profit Target
+              </p>
             </div>
+            <span id="activeCapBadge" class="px-3 py-1 rounded-xl text-xs font-bold font-mono bg-hcGold-500/20 text-hcGold-300 border border-hcGold-500/35">
+              Daily Cap: 35.0%
+            </span>
+          </div>
 
-            <div>
-              <label class="text-gold-300 font-medium">Risk Basis</label>
-              <div class="grid grid-cols-2 gap-2 mt-1">
-                <button type="button" onclick="setRiskMode('percent')" id="riskModePercentBtn" class="p-2 rounded-xl border border-gold-400 bg-gold-500/20 text-gold-300 font-bold text-center">Risk %</button>
-                <button type="button" onclick="setRiskMode('amount')" id="riskModeAmountBtn" class="p-2 rounded-xl border border-gold-500/20 bg-emerald-950 text-slate-300 font-bold text-center">Risk $ Amount</button>
+          <!-- Target % & Consistency Add-On Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div id="targetPercentBox" class="hc-subcard rounded-xl p-3.5 space-y-2">
+              <div class="flex items-center justify-between">
+                <label for="profitTargetPctInput" class="text-xs font-semibold text-hcGold-300">Profit Target (%)</label>
+                <span id="profitTargetDollarDisplay" class="text-xs font-mono font-bold text-emerald-300">$10,000.00</span>
               </div>
+              <input
+                type="number"
+                id="profitTargetPctInput"
+                min="0.1"
+                max="200"
+                step="0.5"
+                value="10"
+                oninput="recalculateAll()"
+                class="w-full px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+              />
             </div>
 
-            <div id="riskPercentWrapper">
-              <label class="text-gold-300 font-medium">Account Risk (%)</label>
-              <input type="number" id="riskPercentInput" value="1" step="0.25" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
-            </div>
-
-            <div id="riskAmountWrapper" class="hidden">
-              <label class="text-gold-300 font-medium">Account Risk ($)</label>
-              <input type="number" id="riskAmountInput" value="1000" step="50" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
-            </div>
-
-            <div>
-              <label class="text-gold-300 font-medium">Stop Loss Distance (Ticks / Pips)</label>
-              <input type="number" id="stopLossInput" value="500" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
-            </div>
-
-            <div>
-              <label class="text-gold-300 font-medium">Tick / Pip Value ($ per 1 Lot)</label>
-              <input type="number" id="tickValueInput" value="0.0005" step="0.0001" oninput="calculatePositionSize()" class="w-full mt-1 bg-emerald-950 border border-gold-500/40 rounded-xl p-2.5 text-white font-bold focus:outline-none focus:border-gold-400">
-              <p id="assetNote" class="text-[10px] text-gold-400/70 mt-1">Specialized Deriv Volatility 25: $0.0005 per tick.</p>
+            <div class="hc-subcard rounded-xl p-3.5 flex flex-col justify-between gap-2">
+              <div class="flex items-center justify-between gap-2">
+                <span class="text-xs font-semibold text-hcGold-300">Consistency Add-On (50% Cap)</span>
+                <label class="inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    id="consistencyAddonToggle"
+                    onchange="recalculateAll()"
+                    class="sr-only peer"
+                  />
+                  <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-hcGold-500 relative"></div>
+                </label>
+              </div>
+              <p class="text-[11px] text-slate-300/80 leading-snug">
+                Removes standard 35%/40% rule, but caps any single day at <strong class="text-hcGold-300">50%</strong> of profit target or payout request.
+              </p>
             </div>
           </div>
-        </div>
 
-        <!-- Calculated Position Results -->
-        <div class="lg:col-span-2 bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-5 flex flex-col justify-between">
-          <div>
-            <h3 class="text-sm font-bold gold-gradient-text flex items-center space-x-2">
-              <i data-lucide="pie-chart" class="w-4 h-4 text-gold-400"></i>
-              <span>Calculated Sizing & Lot Limit Validation</span>
-            </h3>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-              
-              <div class="bg-emerald-950 p-4 rounded-xl border border-gold-500/20">
-                <span class="text-xs text-slate-400 font-medium">Calculated Position Size</span>
-                <div id="calculatedLotSize" class="text-3xl font-black text-gold-300 mt-1">4.00 Lots</div>
-                <span class="text-[10px] text-gold-400/80">Based on $1,000 Risk & 500 Tick SL</span>
-              </div>
-
-              <div class="bg-emerald-950 p-4 rounded-xl border border-gold-500/20">
-                <span class="text-xs text-slate-400 font-medium">HerConsolidation Vol 25 Max Lot Limit</span>
-                <div id="maxAllowedLotSize" class="text-3xl font-black text-white mt-1">38.40 Lots</div>
-                <span class="text-[10px] text-slate-400">Specific to selected account size ($100k)</span>
-              </div>
-
-            </div>
-
-            <!-- Position Limit Warnings -->
-            <div id="lotWarningBox" class="mt-4 p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-start space-x-3">
-              <i data-lucide="check-circle-2" id="lotWarningIcon" class="w-5 h-5 text-emerald-400 mt-0.5"></i>
+          <!-- Funded Phase Payout Request Controls (Visible in Funded mode or quick toggle) -->
+          <div id="fundedPayoutPanel" class="hidden hc-subcard rounded-2xl p-4 border border-hcGold-500/35 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
               <div>
-                <h4 id="lotWarningTitle" class="text-xs font-bold text-emerald-400">Position Size Within Limits</h4>
-                <p id="lotWarningDesc" class="text-[11px] text-slate-300 mt-0.5">Your calculated lot size is safely below the HerConsolidation maximum lot threshold for this account size.</p>
+                <h3 class="text-sm font-bold text-hcGold-300">Funded Phase — Payout Consistency Adjuster</h3>
+                <p class="text-[11px] text-slate-300/80">
+                  Max allowed single trading day = Consistency % × Requested Payout Amount
+                </p>
+              </div>
+              <button
+                type="button"
+                onclick="applyPayoutExample()"
+                class="px-2.5 py-1 rounded-lg text-[11px] font-semibold border border-hcGold-500/40 text-hcGold-300 hover:bg-hcGold-500/15 cursor-pointer"
+              >
+                Load $4,000 / $1,500 Example
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div>
+                <label for="requestedPayoutInput" class="block text-xs font-semibold text-hcGold-300 mb-1">
+                  Requested Payout Amount ($)
+                </label>
+                <input
+                  type="number"
+                  id="requestedPayoutInput"
+                  min="1"
+                  step="50"
+                  value="4000"
+                  oninput="recalculateAll()"
+                  class="w-full px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+                />
+              </div>
+              <div>
+                <label for="highestDayPayoutInput" class="block text-xs font-semibold text-hcGold-300 mb-1">
+                  Highest Single Trading Day in Period ($)
+                </label>
+                <input
+                  type="number"
+                  id="highestDayPayoutInput"
+                  min="0"
+                  step="50"
+                  value="1500"
+                  oninput="recalculateAll()"
+                  class="w-full px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+                />
+              </div>
+            </div>
+
+            <!-- Payout Verdict & Required Target Calculation -->
+            <div id="payoutVerdictBox" class="rounded-xl p-3.5 border text-xs space-y-1.5 bg-amber-950/40 border-amber-400/40 text-amber-100">
+              <div class="flex items-center justify-between font-bold">
+                <span id="payoutVerdictTitle">Payout Adjustment Required</span>
+                <span id="payoutAllowedDayCap" class="font-mono">Max Day: $1,400.00</span>
+              </div>
+              <p id="payoutVerdictDetail" class="text-[11px] leading-relaxed">
+                Highest day ($1,500.00) exceeds 35% of $4,000.00 ($1,400.00). Minimum accumulated payout needed = $1,500.00 / 0.35 = $4,285.71.
+              </p>
+            </div>
+          </div>
+
+          <!-- 3 Key Output Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+            <div class="hc-subcard rounded-xl p-4">
+              <p class="text-[11px] uppercase tracking-wider font-semibold text-slate-400" id="metric1Label">Profit Target ($)</p>
+              <p id="metric1Value" class="text-xl sm:text-2xl font-extrabold font-mono text-white mt-1">$10,000.00</p>
+              <p id="metric1Sub" class="text-[11px] text-emerald-400 mt-1">10.0% of $100,000</p>
+            </div>
+
+            <div class="hc-subcard rounded-xl p-4 border-hcGold-500/40">
+              <p class="text-[11px] uppercase tracking-wider font-semibold text-hcGold-400">Max Single-Day Profit</p>
+              <p id="metric2Value" class="text-xl sm:text-2xl font-extrabold font-mono hc-gold-text mt-1">$3,500.00</p>
+              <p id="metric2Sub" class="text-[11px] text-slate-300/80 mt-1">35% of $10,000.00</p>
+            </div>
+
+            <div class="hc-subcard rounded-xl p-4">
+              <p class="text-[11px] uppercase tracking-wider font-semibold text-slate-400">Safe Daily Buffer (-3%)</p>
+              <p id="metric3Value" class="text-xl sm:text-2xl font-extrabold font-mono text-emerald-300 mt-1">$3,395.00</p>
+              <p class="text-[11px] text-slate-300/80 mt-1">Avoids slippage breach</p>
+            </div>
+          </div>
+
+          <!-- Quick Single-Day Profit Compliance Tester -->
+          <div class="hc-subcard rounded-xl p-4 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <label for="quickDayTestInput" class="text-xs font-semibold text-hcGold-300">
+                Single-Day Profit Stress Tester ($)
+              </label>
+              <span id="quickDayShareBadge" class="text-xs font-mono font-bold text-slate-300">0.0% of benchmark</span>
+            </div>
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <input
+                type="number"
+                id="quickDayTestInput"
+                min="0"
+                step="50"
+                value="2800"
+                oninput="recalculateAll()"
+                class="w-full sm:w-44 px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+              />
+              <input
+                type="range"
+                id="quickDayTestSlider"
+                min="0"
+                max="10000"
+                step="25"
+                value="2800"
+                oninput="syncQuickDaySlider(this.value)"
+                class="w-full hc-slider"
+              />
+            </div>
+            <div id="quickDayResultBox" class="text-xs font-semibold pt-1"></div>
+          </div>
+        </div>
+
+        <!-- Right 5 Cols: Multi-Day Profit Log & Simulator -->
+        <div class="lg:col-span-5 hc-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-4">
+          <div class="space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="text-base sm:text-lg font-bold hc-gold-text">Multi-Day Profit Simulator</h3>
+                <p class="text-xs text-slate-300/80">Add, edit, or reset daily PnL to test consistency &amp; target progress</p>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  id="clearSimDaysBtn"
+                  onclick="clearAllSimDays()"
+                  class="px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-rose-400/60 hover:text-rose-300 cursor-pointer transition-colors"
+                >
+                  Clear All
+                </button>
+                <button
+                  type="button"
+                  id="resetSimDaysBtn"
+                  onclick="resetDayLogs()"
+                  class="px-2.5 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-colors"
+                >
+                  Reset Simulator
+                </button>
+              </div>
+            </div>
+
+            <!-- Add New Day PnL Form -->
+            <form id="addDayLogForm" onsubmit="handleAddDayLog(event)" class="hc-subcard rounded-xl p-3 space-y-2.5">
+              <div class="flex flex-col sm:flex-row gap-2">
+                <input
+                  type="text"
+                  id="newDayLabelInput"
+                  maxlength="24"
+                  placeholder="Label (opt.)"
+                  aria-label="Optional day label"
+                  class="w-full sm:w-28 px-2.5 py-2 rounded-xl text-xs font-medium hc-input"
+                />
+                <input
+                  type="number"
+                  id="newDayInput"
+                  step="any"
+                  placeholder="Day PnL ($ e.g. 120 or -40)"
+                  aria-label="New day PnL in dollars"
+                  onkeydown="handleNewDayKeyDown(event)"
+                  class="flex-1 min-w-0 px-3 py-2 rounded-xl text-sm font-mono font-semibold hc-input"
+                />
+                <button
+                  type="submit"
+                  id="addDayLogBtn"
+                  class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold hc-btn-gold shrink-0 cursor-pointer"
+                >
+                  + Add Day
+                </button>
+              </div>
+
+              <!-- Quick PnL Preset Chips -->
+              <div class="flex flex-wrap items-center justify-between gap-2 pt-0.5">
+                <div class="flex flex-wrap items-center gap-1.5">
+                  <span class="text-[10px] uppercase tracking-wider font-semibold text-slate-400">Quick PnL:</span>
+                  <button
+                    type="button"
+                    onclick="addQuickDayPnl(100)"
+                    class="px-2 py-0.5 rounded-lg text-[11px] font-mono font-semibold border border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:border-emerald-400 cursor-pointer"
+                  >
+                    +$100
+                  </button>
+                  <button
+                    type="button"
+                    onclick="addQuickDayPnl(150)"
+                    class="px-2 py-0.5 rounded-lg text-[11px] font-mono font-semibold border border-emerald-500/30 bg-emerald-950/40 text-emerald-300 hover:border-emerald-400 cursor-pointer"
+                  >
+                    +$150
+                  </button>
+                  <button
+                    type="button"
+                    onclick="addQuickDayPnl(-50)"
+                    class="px-2 py-0.5 rounded-lg text-[11px] font-mono font-semibold border border-rose-500/30 bg-rose-950/40 text-rose-300 hover:border-rose-400 cursor-pointer"
+                  >
+                    -$50
+                  </button>
+                </div>
+                <span id="simFeedbackMessage" class="text-[11px] font-medium text-hcGold-300"></span>
+              </div>
+            </form>
+
+            <!-- Sequence Summary Strip -->
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="hc-subcard rounded-xl p-2.5">
+                <p class="text-[10px] uppercase text-slate-400 font-semibold">Cumulative PnL</p>
+                <p id="simTotalProfit" class="text-sm font-extrabold font-mono text-emerald-300 mt-0.5">$0.00</p>
+              </div>
+              <div class="hc-subcard rounded-xl p-2.5">
+                <p class="text-[10px] uppercase text-slate-400 font-semibold">Highest Day</p>
+                <p id="simHighestDay" class="text-sm font-extrabold font-mono text-hcGold-300 mt-0.5">$0.00</p>
+              </div>
+              <div class="hc-subcard rounded-xl p-2.5">
+                <p class="text-[10px] uppercase text-slate-400 font-semibold">Consistency</p>
+                <p id="simStatusBadge" class="text-xs font-extrabold mt-1 text-emerald-300">COMPLIANT</p>
+              </div>
+            </div>
+
+            <!-- Target Progress Bar -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-300/80 font-medium" id="simProgressLabel">Progress toward Profit Target</span>
+                <span id="simProgressPct" class="font-mono font-bold text-hcGold-300">0.0%</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-hcEmerald-950 overflow-hidden border border-hcGold-500/20">
+                <div id="simProgressBar" class="h-full bg-gradient-to-r from-hcGold-500 to-emerald-400 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Day Entries Table -->
+            <div class="max-h-64 overflow-y-auto rounded-xl border border-hcGold-500/20">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead class="sticky top-0 bg-hcEmerald-950 text-hcGold-300 border-b border-hcGold-500/25">
+                  <tr>
+                    <th class="py-2.5 px-3 font-semibold">Session</th>
+                    <th class="py-2.5 px-2.5 font-semibold">PnL ($)</th>
+                    <th class="py-2.5 px-2.5 font-semibold">% Share</th>
+                    <th class="py-2.5 px-2.5 font-semibold">Rule</th>
+                    <th class="py-2.5 px-2 text-right font-semibold">Del</th>
+                  </tr>
+                </thead>
+                <tbody id="dayLogTableBody" class="divide-y divide-hcGold-500/10"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <p id="simRuleNote" class="text-[11px] text-slate-300/80 leading-relaxed pt-2 border-t border-hcGold-500/15">
+            Tip: Edit any day's PnL directly in the table or add new sessions to verify compliance against your active daily profit cap.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 2: POSITION & ACCOUNT LIMITS CHECKER (SECTION 1.2.7)
+    ====================================================================== -->
+    <section id="section-limits" class="calc-section hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Open Positions Limits Card (Max 5 per asset, Max 13 per account) -->
+        <div class="hc-card rounded-2xl p-5 sm:p-6 space-y-5">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-hcGold-400">Section 1.2.7 • Exposure Caps</span>
+            <h2 class="text-lg sm:text-xl font-bold hc-gold-text mt-0.5">Open Position Limits Checker</h2>
+            <p class="text-xs text-slate-300/80 mt-1">
+              Strict ceiling of <strong class="text-hcGold-300">5 open positions per asset</strong> and <strong class="text-hcGold-300">13 total open positions per account</strong>.
+            </p>
+          </div>
+
+          <!-- Open Positions Per Asset -->
+          <div class="hc-subcard rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-hcGold-300">Open Positions on Selected Asset</p>
+                <p class="text-[11px] text-slate-300/75">Maximum allowed per single asset: 5</p>
+              </div>
+              <span id="posAssetBadge" class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                2 / 5 OK
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <button type="button" onclick="adjustAssetPositions(-1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">−</button>
+              <div class="text-center">
+                <span id="openPosAssetCount" class="text-2xl font-extrabold font-mono">2</span>
+                <span class="text-xs text-slate-400 ml-1">/ 5 max</span>
+              </div>
+              <button type="button" onclick="adjustAssetPositions(1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">+</button>
+            </div>
+          </div>
+
+          <!-- Total Open Positions Per Account -->
+          <div class="hc-subcard rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-hcGold-300">Total Open Positions Across Account</p>
+                <p class="text-[11px] text-slate-300/75">Maximum allowed across entire account: 13</p>
+              </div>
+              <span id="posAccountBadge" class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                6 / 13 OK
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <button type="button" onclick="adjustAccountPositions(-1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">−</button>
+              <div class="text-center">
+                <span id="openPosAccountCount" class="text-2xl font-extrabold font-mono">6</span>
+                <span class="text-xs text-slate-400 ml-1">/ 13 max</span>
+              </div>
+              <button type="button" onclick="adjustAccountPositions(1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">+</button>
+            </div>
+          </div>
+
+          <div id="positionLimitsSummary" class="rounded-xl p-3.5 text-xs font-semibold bg-emerald-950/50 border border-emerald-400/30 text-emerald-200">
+            Both per-asset (2/5) and total account (6/13) position counts are compliant. You can open up to 3 more trades on this asset and 7 more on the account.
+          </div>
+        </div>
+
+        <!-- Account Limits Per Trader Card (Max 4 Challenge, Max 1 Live/Funded) -->
+        <div class="hc-card rounded-2xl p-5 sm:p-6 space-y-5">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-hcGold-400">Section 1.2.7 • Trader Allocation</span>
+            <h2 class="text-lg sm:text-xl font-bold hc-gold-text mt-0.5">Account Limits per Trader</h2>
+            <p class="text-xs text-slate-300/80 mt-1">
+              A trader may hold at most <strong class="text-hcGold-300">4 challenge accounts</strong> and only <strong class="text-hcGold-300">1 live (funded) account</strong> at any one time.
+            </p>
+          </div>
+
+          <!-- Active Challenge Accounts -->
+          <div class="hc-subcard rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-hcGold-300">Active Challenge Accounts</p>
+                <p class="text-[11px] text-slate-300/75">Concurrent limit per trader: 4</p>
+              </div>
+              <span id="challengeAcctBadge" class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                2 / 4 OK
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <button type="button" onclick="adjustChallengeAccounts(-1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">−</button>
+              <div class="text-center">
+                <span id="activeChallengeAcctCount" class="text-2xl font-extrabold font-mono">2</span>
+                <span class="text-xs text-slate-400 ml-1">/ 4 max</span>
+              </div>
+              <button type="button" onclick="adjustChallengeAccounts(1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">+</button>
+            </div>
+          </div>
+
+          <!-- Active Live / Funded Accounts -->
+          <div class="hc-subcard rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs font-bold text-hcGold-300">Active Live (Funded) Accounts</p>
+                <p class="text-[11px] text-slate-300/75">Concurrent limit per trader: 1</p>
+              </div>
+              <span id="fundedAcctBadge" class="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                1 / 1 OK
+              </span>
+            </div>
+
+            <div class="flex items-center justify-between gap-3">
+              <button type="button" onclick="adjustFundedAccounts(-1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">−</button>
+              <div class="text-center">
+                <span id="activeFundedAcctCount" class="text-2xl font-extrabold font-mono">1</span>
+                <span class="text-xs text-slate-400 ml-1">/ 1 max</span>
+              </div>
+              <button type="button" onclick="adjustFundedAccounts(1)" class="w-10 h-10 rounded-xl hc-card font-bold text-base hover:border-hcGold-400 cursor-pointer">+</button>
+            </div>
+          </div>
+
+          <div id="accountLimitsSummary" class="rounded-xl p-3.5 text-xs font-semibold bg-emerald-950/50 border border-emerald-400/30 text-emerald-200">
+            Trader account allocation is within limits (2/4 challenge accounts, 1/1 live funded account).
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 3: COMPLETE 40-ASSET MAXIMUM LOT SIZES TABLE (SECTION 1.2.8)
+    ====================================================================== -->
+    <section id="section-lots" class="calc-section hidden space-y-6">
+      <!-- Planned Lot Size Compliance Tester -->
+      <div class="hc-card rounded-2xl p-5 sm:p-6 space-y-4">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-hcGold-400">Section 1.2.8 • Risk Exposure Guard</span>
+            <h2 class="text-lg sm:text-xl font-bold hc-gold-text">Planned Lot Size Compliance Tester</h2>
+            <p class="text-xs text-slate-300/80">
+              Select any of the 40 synthetic/index assets and enter your planned lot size to verify compliance for your active account size.
+            </p>
+          </div>
+          <span id="lotTableAssetCount" class="px-3 py-1 rounded-xl text-xs font-mono font-bold bg-hcGold-500/15 text-hcGold-300 border border-hcGold-500/30 self-start md:self-auto">
+            40 Assets Loaded
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+          <div>
+            <label for="lotTesterAssetSelect" class="block text-xs font-semibold text-hcGold-300 mb-1">Asset</label>
+            <select
+              id="lotTesterAssetSelect"
+              onchange="handleLotAssetDropdown(this.value)"
+              class="w-full px-3 py-2.5 rounded-xl text-sm font-semibold hc-input"
+            ></select>
+          </div>
+
+          <div>
+            <label for="plannedLotInput" class="block text-xs font-semibold text-hcGold-300 mb-1">Planned Lot Size</label>
+            <input
+              type="number"
+              id="plannedLotInput"
+              min="0.001"
+              step="0.01"
+              value="1.50"
+              oninput="recalculateAll()"
+              class="w-full px-3 py-2.5 rounded-xl text-sm font-mono font-bold hc-input"
+            />
+          </div>
+
+          <div id="plannedLotVerdictCard" class="rounded-xl p-3.5 border bg-emerald-950/50 border-emerald-400/35">
+            <p id="plannedLotVerdictTitle" class="text-xs font-bold text-emerald-300">Within Max Lot Limit</p>
+            <p id="plannedLotVerdictDetail" class="text-[11px] text-slate-200 font-mono mt-0.5">
+              Max for Volatility 25 ($100k): 38.40 lots
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Bar + Full 40-Asset Table -->
+      <div class="hc-card rounded-2xl p-5 sm:p-6 space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+          <!-- Category Filter Pills -->
+          <div class="flex flex-wrap items-center gap-1.5" role="group" aria-label="Filter assets by category">
+            <button type="button" onclick="setAssetCategory('all')" data-cat="all" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold hc-btn-gold cursor-pointer">All (40)</button>
+            <button type="button" onclick="setAssetCategory('boom_crash')" data-cat="boom_crash" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">Boom &amp; Crash</button>
+            <button type="button" onclick="setAssetCategory('vol')" data-cat="vol" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">Volatility</button>
+            <button type="button" onclick="setAssetCategory('vol_1s')" data-cat="vol_1s" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">Volatility (1s)</button>
+            <button type="button" onclick="setAssetCategory('step')" data-cat="step" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">Step</button>
+            <button type="button" onclick="setAssetCategory('jump')" data-cat="jump" class="cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">Jump</button>
+          </div>
+
+          <!-- Search Input -->
+          <div class="w-full lg:w-72">
+            <input
+              type="text"
+              id="assetSearchInput"
+              oninput="renderLotTable()"
+              placeholder="Search asset (e.g. Boom 1000, Step 200)..."
+              aria-label="Search assets"
+              class="w-full px-3.5 py-2 rounded-xl text-xs sm:text-sm hc-input"
+            />
+          </div>
+        </div>
+
+        <p id="customScaleNotice" class="hidden text-xs font-medium text-hcGold-300 bg-hcGold-500/10 border border-hcGold-500/30 rounded-xl px-3.5 py-2">
+          Showing proportionally scaled max lots for your custom account size alongside standard tier columns.
+        </p>
+
+        <!-- Responsive Table -->
+        <div class="overflow-x-auto rounded-xl border border-hcGold-500/20">
+          <table class="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr class="bg-hcEmerald-950 text-hcGold-300 border-b border-hcGold-500/30">
+                <th class="py-3 px-3.5 font-bold">Asset</th>
+                <th class="py-3 px-3 font-mono font-bold text-right">5k</th>
+                <th class="py-3 px-3 font-mono font-bold text-right">10k</th>
+                <th class="py-3 px-3 font-mono font-bold text-right">25k</th>
+                <th class="py-3 px-3 font-mono font-bold text-right">50k</th>
+                <th class="py-3 px-3 font-mono font-bold text-right">100k</th>
+                <th id="customLotColHeader" class="hidden py-3 px-3.5 font-mono font-bold text-right text-emerald-300">Active Size</th>
+              </tr>
+            </thead>
+            <tbody id="maxLotsTableBody" class="divide-y divide-hcGold-500/10"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         SECTION 4: MANUAL TRADING RISK POSITION CALCULATOR
+    ====================================================================== -->
+    <section id="section-manual" class="calc-section hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 7 Cols: Inputs & Quick Presets -->
+        <div class="lg:col-span-7 hc-card rounded-2xl p-5 sm:p-6 space-y-5">
+          <div>
+            <span class="text-[11px] font-bold uppercase tracking-wider text-hcGold-400">Manual Execution Sizing</span>
+            <h2 class="text-lg sm:text-xl font-bold hc-gold-text mt-0.5">Manual Trading Risk Position Calculator</h2>
+            <p class="text-xs text-slate-300/80 mt-1">
+              Calculate recommended lot size and units from account risk, stop-loss distance, and pip/tick value, then cross-check against asset lot caps.
+            </p>
+          </div>
+
+          <!-- Risk Mode & Value -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="hc-subcard rounded-xl p-3.5 space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="text-xs font-semibold text-hcGold-300">Risk Basis</label>
+                <div class="inline-flex rounded-lg p-0.5 bg-hcEmerald-950 border border-hcGold-500/25 text-[11px]">
+                  <button type="button" id="riskModePctBtn" onclick="setManualRiskMode('percent')" class="px-2.5 py-1 rounded-md font-bold hc-btn-gold cursor-pointer">% Risk</button>
+                  <button type="button" id="riskModeUsdBtn" onclick="setManualRiskMode('dollar')" class="px-2.5 py-1 rounded-md font-semibold text-slate-300 cursor-pointer">$ Risk</button>
+                </div>
+              </div>
+
+              <div id="manualRiskPctGroup">
+                <label for="manualRiskPctInput" class="block text-[11px] text-slate-400 mb-1">Risk Percentage (%)</label>
+                <input
+                  type="number"
+                  id="manualRiskPctInput"
+                  min="0.05"
+                  max="25"
+                  step="0.25"
+                  value="1"
+                  oninput="recalculateAll()"
+                  class="w-full px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+                />
+                <div class="flex flex-wrap gap-1.5 mt-2">
+                  <button type="button" onclick="setRiskPctPreset(0.25)" class="px-2 py-1 rounded-lg text-[11px] font-mono border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">0.25%</button>
+                  <button type="button" onclick="setRiskPctPreset(0.5)" class="px-2 py-1 rounded-lg text-[11px] font-mono border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">0.5%</button>
+                  <button type="button" onclick="setRiskPctPreset(1)" class="px-2 py-1 rounded-lg text-[11px] font-mono border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">1%</button>
+                  <button type="button" onclick="setRiskPctPreset(2)" class="px-2 py-1 rounded-lg text-[11px] font-mono border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">2%</button>
+                </div>
+              </div>
+
+              <div id="manualRiskUsdGroup" class="hidden">
+                <label for="manualRiskUsdInput" class="block text-[11px] text-slate-400 mb-1">Risk Amount ($ USD)</label>
+                <input
+                  type="number"
+                  id="manualRiskUsdInput"
+                  min="1"
+                  step="25"
+                  value="500"
+                  oninput="recalculateAll()"
+                  class="w-full px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+                />
+              </div>
+            </div>
+
+            <div class="hc-subcard rounded-xl p-3.5 space-y-3">
+              <div>
+                <label for="manualStopLossInput" class="block text-xs font-semibold text-hcGold-300 mb-1">
+                  Stop-Loss Distance (Pips / Points / Ticks)
+                </label>
+                <input
+                  type="number"
+                  id="manualStopLossInput"
+                  min="0.1"
+                  step="1"
+                  value="250"
+                  oninput="recalculateAll()"
+                  class="w-full px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+                />
+              </div>
+
+              <div>
+                <label for="manualPipValueInput" class="block text-xs font-semibold text-hcGold-300 mb-1">
+                  Value per 1.00 Lot per Pip/Tick ($)
+                </label>
+                <input
+                  type="number"
+                  id="manualPipValueInput"
+                  min="0.0001"
+                  step="0.0005"
+                  value="1"
+                  oninput="recalculateAll()"
+                  class="w-full px-3 py-2 rounded-xl text-sm font-mono font-bold hc-input"
+                />
               </div>
             </div>
           </div>
 
-          <!-- HerConsolidation Lot Scaling Rules Chart -->
-          <div class="border-t border-gold-500/20 pt-4">
-            <h4 class="text-xs font-bold text-gold-300 mb-2">HerConsolidation Volatility 25 Max Lot Scaling Reference Table</h4>
-            <div class="grid grid-cols-5 gap-2 text-center text-xs">
-              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$5k</div><div class="font-bold text-gold-300">1.92</div></div>
-              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$10k</div><div class="font-bold text-gold-300">3.84</div></div>
-              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$25k</div><div class="font-bold text-gold-300">9.60</div></div>
-              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$50k</div><div class="font-bold text-gold-300">19.20</div></div>
-              <div class="bg-emerald-950 p-2 rounded-lg border border-gold-500/20"><div class="text-[10px] text-slate-400">$100k</div><div class="font-bold text-gold-300">38.40</div></div>
+          <!-- Asset & Instrument Presets -->
+          <div class="hc-subcard rounded-xl p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold text-hcGold-300">Instrument &amp; Lot Cap Reference</span>
+              <select
+                id="manualRefAssetSelect"
+                onchange="handleManualRefAssetChange(this.value)"
+                class="px-3 py-1.5 rounded-xl text-xs font-semibold hc-input"
+              ></select>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5">
+              <button type="button" onclick="applyInstrumentPreset('vol_index', 1)" class="px-2.5 py-1.5 rounded-xl text-[11px] font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">
+                Volatility Index ($1/pt)
+              </button>
+              <button type="button" onclick="applyInstrumentPreset('deriv_tick', 0.0005)" class="px-2.5 py-1.5 rounded-xl text-[11px] font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">
+                Deriv Tick Ref ($0.0005 • 4000:1)
+              </button>
+              <button type="button" onclick="applyInstrumentPreset('forex_std', 10)" class="px-2.5 py-1.5 rounded-xl text-[11px] font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">
+                Forex Standard ($10/pip)
+              </button>
+              <button type="button" onclick="applyInstrumentPreset('gold_std', 1)" class="px-2.5 py-1.5 rounded-xl text-[11px] font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer">
+                Gold / Metal ($1/pt)
+              </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+              <div>
+                <label for="manualUnitsMultiplierInput" class="block text-[11px] text-slate-400 mb-1">
+                  Units per 1.00 Lot (Conversion)
+                </label>
+                <input
+                  type="number"
+                  id="manualUnitsMultiplierInput"
+                  min="1"
+                  step="1"
+                  value="1000"
+                  oninput="recalculateAll()"
+                  class="w-full px-3 py-1.5 rounded-xl text-xs font-mono font-semibold hc-input"
+                />
+              </div>
+              <div class="flex flex-col justify-center text-[11px] text-slate-300/80">
+                <span>Formula: <code class="font-mono text-hcGold-300">Lots = Risk$ ÷ (SL × Pip/Tick$)</code></span>
+                <span class="text-slate-400 mt-0.5">Deriv Vol 25 ref: 4000:1 leverage, $0.0005 tick ref.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right 5 Cols: Position Output & Max Lot Guardrail -->
+        <div class="lg:col-span-5 hc-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between space-y-5">
+          <div class="space-y-4">
+            <h3 class="text-base sm:text-lg font-bold hc-gold-text">Recommended Position Size</h3>
+
+            <div class="hc-subcard rounded-2xl p-4 border-hcGold-500/40">
+              <p class="text-[11px] uppercase tracking-wider font-semibold text-hcGold-400">Calculated Lot Size</p>
+              <p id="manualCalcLots" class="text-3xl sm:text-4xl font-extrabold font-mono hc-gold-text mt-1">4.00 Lots</p>
+              <p id="manualCalcUnits" class="text-xs font-mono text-emerald-300 mt-1">≈ 4,000 Units</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="hc-subcard rounded-xl p-3.5">
+                <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Dollar Risk</p>
+                <p id="manualCalcRiskUsd" class="text-lg font-extrabold font-mono text-rose-300 mt-1">$1,000.00</p>
+              </div>
+              <div class="hc-subcard rounded-xl p-3.5">
+                <p class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Asset Max Lot Cap</p>
+                <p id="manualAssetMaxLot" class="text-lg font-extrabold font-mono text-white mt-1">38.40 Lots</p>
+              </div>
+            </div>
+
+            <!-- Guardrail Comparison Box -->
+            <div id="manualLotGuardrailBox" class="rounded-xl p-4 border text-xs space-y-1 bg-emerald-950/50 border-emerald-400/35 text-emerald-200">
+              <p id="manualGuardrailTitle" class="font-bold">Within Asset Maximum Lot Limit</p>
+              <p id="manualGuardrailDesc" class="text-[11px] leading-relaxed">
+                Calculated position (4.00 lots) is below the Volatility 25 cap (38.40 lots) for a $100,000 account.
+              </p>
             </div>
           </div>
 
+          <button
+            type="button"
+            onclick="applyCalculatedLotToTester()"
+            class="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold hc-btn-gold cursor-pointer"
+          >
+            Send Calculated Lots to Compliance Tester →
+          </button>
         </div>
-
       </div>
-
-    </div>
-
-    <!-- TAB 3: ACCOUNT LIMITS & RULES -->
-    <div id="tab-limits-content" class="tab-pane hidden space-y-6">
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <!-- Position Limits Card -->
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
-          <div class="flex items-center space-x-3">
-            <div class="p-2 rounded-xl bg-gold-500/20 text-gold-300 border border-gold-500/30">
-              <i data-lucide="layers" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold gold-gradient-text">Open Position Exposure Limits</h3>
-              <p class="text-[10px] text-slate-400">Strict cap on concurrently open positions</p>
-            </div>
-          </div>
-
-          <div class="space-y-3 pt-2">
-            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
-              <span class="text-xs text-slate-300 font-medium">Max Open Positions per Single Asset</span>
-              <span class="text-base font-extrabold text-gold-300">5 Positions</span>
-            </div>
-            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
-              <span class="text-xs text-slate-300 font-medium">Max Total Open Positions across Account</span>
-              <span class="text-base font-extrabold text-gold-300">13 Positions</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Account Quantity Limits -->
-        <div class="bg-[#062c21] border border-gold-500/30 rounded-2xl p-5 space-y-4">
-          <div class="flex items-center space-x-3">
-            <div class="p-2 rounded-xl bg-gold-500/20 text-gold-300 border border-gold-500/30">
-              <i data-lucide="users" class="w-5 h-5"></i>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold gold-gradient-text">Trader Account Quantity Limits</h3>
-              <p class="text-[10px] text-slate-400">Per individual trader / IP / household</p>
-            </div>
-          </div>
-
-          <div class="space-y-3 pt-2">
-            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
-              <span class="text-xs text-slate-300 font-medium">Max Challenge Accounts Active</span>
-              <span class="text-base font-extrabold text-gold-300">4 Accounts</span>
-            </div>
-            <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-950 border border-gold-500/20">
-              <span class="text-xs text-slate-300 font-medium">Max Funded / Live Accounts Active</span>
-              <span class="text-base font-extrabold text-gold-300">1 Account</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-    </div>
+    </section>
 
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-[#062c21] border-t border-gold-500/20 py-4 px-4 text-center text-xs text-slate-400">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2">
-      <div class="flex items-center space-x-2">
-        <span class="font-bold text-gold-400">HerConsolidation</span>
-        <span>&copy; 2026. All Rights Reserved.</span>
+  <!-- FOOTER -->
+  <footer id="appFooter" class="bg-hcEmerald-950/90 dark:bg-hcEmerald-950/90 border-t border-hcGold-500/20 py-4 px-4 sm:px-6 lg:px-8 mt-8 transition-colors duration-300">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-hcGold-400">h.co</span>
+        <span>Prop Firm Risk &amp; Consistency Calculator</span>
       </div>
-      <div class="text-[11px] text-slate-400">
-        Risk Warning: Trading synthetic indices and financial instruments carries significant risk. Always monitor lot scaling limits.
-      </div>
+      <p class="text-center sm:text-right text-[11px]">
+        For risk planning and rule simulation only. Always verify live account parameters and position limits before placing orders.
+      </p>
     </div>
   </footer>
 
-  <!-- Application Logic JS -->
   <script>
-    // State Store
-    const state = {
+    /**
+     * Complete 40-Asset Maximum Lot Table (Section 1.2.8)
+     * Keys: name, category, lots: { 5000, 10000, 25000, 50000, 100000 }
+     */
+    const ASSETS_DATA = [
+      { name: 'Boom 1000', category: 'boom_crash', lots: { 5000: 0.4, 10000: 0.8, 25000: 2.0, 50000: 4.0, 100000: 8.0 } },
+      { name: 'Boom 900', category: 'boom_crash', lots: { 5000: 0.5, 10000: 1.0, 25000: 2.7, 50000: 5.4, 100000: 10.9 } },
+      { name: 'Boom 600', category: 'boom_crash', lots: { 5000: 0.64, 10000: 1.28, 25000: 3.2, 50000: 6.4, 100000: 12.8 } },
+      { name: 'Boom 500', category: 'boom_crash', lots: { 5000: 0.72, 10000: 1.44, 25000: 3.6, 50000: 7.2, 100000: 14.4 } },
+      { name: 'Boom 300', category: 'boom_crash', lots: { 5000: 0.76, 10000: 1.52, 25000: 3.8, 50000: 7.6, 100000: 15.2 } },
+      { name: 'Boom 150', category: 'boom_crash', lots: { 5000: 2.08, 10000: 4.16, 25000: 10.4, 50000: 20.8, 100000: 41.6 } },
+
+      { name: 'Crash 1000', category: 'boom_crash', lots: { 5000: 1.2, 10000: 2.4, 25000: 6.0, 50000: 12.0, 100000: 24.0 } },
+      { name: 'Crash 900', category: 'boom_crash', lots: { 5000: 0.26, 10000: 0.52, 25000: 1.3, 50000: 2.6, 100000: 5.2 } },
+      { name: 'Crash 600', category: 'boom_crash', lots: { 5000: 0.2, 10000: 0.4, 25000: 1.0, 50000: 2.0, 100000: 4.0 } },
+      { name: 'Crash 500', category: 'boom_crash', lots: { 5000: 1.18, 10000: 2.36, 25000: 5.9, 50000: 11.8, 100000: 23.6 } },
+      { name: 'Crash 300', category: 'boom_crash', lots: { 5000: 0.6, 10000: 1.16, 25000: 4.15, 50000: 8.3, 100000: 16.5 } },
+      { name: 'Crash 150', category: 'boom_crash', lots: { 5000: 2.0, 10000: 4.0, 25000: 10, 50000: 20, 100000: 40 } },
+
+      { name: 'Volatility 5', category: 'vol', lots: { 5000: 0.2, 10000: 0.4, 25000: 1.0, 50000: 2.0, 100000: 4.0 } },
+      { name: 'Volatility 10', category: 'vol', lots: { 5000: 2.0, 10000: 4.0, 25000: 10, 50000: 20, 100000: 40 } },
+      { name: 'Volatility 15', category: 'vol', lots: { 5000: 0.07, 10000: 0.14, 25000: 0.35, 50000: 0.7, 100000: 1.4 } },
+      { name: 'Volatility 25', category: 'vol', lots: { 5000: 1.92, 10000: 3.84, 25000: 9.6, 50000: 19.2, 100000: 38.4 } },
+      { name: 'Volatility 30', category: 'vol', lots: { 5000: 0.03, 10000: 0.06, 25000: 0.15, 50000: 0.3, 100000: 0.6 } },
+      { name: 'Volatility 50', category: 'vol', lots: { 5000: 19, 10000: 38, 25000: 96, 50000: 192, 100000: 384 } },
+      { name: 'Volatility 75', category: 'vol', lots: { 5000: 0.06, 10000: 0.12, 25000: 0.3, 50000: 0.6, 100000: 1.2 } },
+      { name: 'Volatility 90', category: 'vol', lots: { 5000: 0.01, 10000: 0.01, 25000: 0.03, 50000: 0.06, 100000: 0.12 } },
+      { name: 'Volatility 100', category: 'vol', lots: { 5000: 1.05, 10000: 2.1, 25000: 5.25, 50000: 10.5, 100000: 21 } },
+
+      { name: 'Volatility 5 (1s)', category: 'vol_1s', lots: { 5000: 0.2, 10000: 0.4, 25000: 1.0, 50000: 2.0, 100000: 4.0 } },
+      { name: 'Volatility 10 (1s)', category: 'vol_1s', lots: { 5000: 0.65, 10000: 1.3, 25000: 3.25, 50000: 6.5, 100000: 13 } },
+      { name: 'Volatility 15 (1s)', category: 'vol_1s', lots: { 5000: 0.5, 10000: 1.0, 25000: 2.5, 50000: 5.0, 100000: 10 } },
+      { name: 'Volatility 25 (1s)', category: 'vol_1s', lots: { 5000: 0.005, 10000: 0.008, 25000: 0.02, 50000: 0.04, 100000: 0.08 } },
+      { name: 'Volatility 30 (1s)', category: 'vol_1s', lots: { 5000: 0.5, 10000: 1.0, 25000: 2.5, 50000: 5.0, 100000: 10 } },
+      { name: 'Volatility 50 (1s)', category: 'vol_1s', lots: { 5000: 0.008, 10000: 0.015, 25000: 0.03, 50000: 0.06, 100000: 0.12 } },
+      { name: 'Volatility 75 (1s)', category: 'vol_1s', lots: { 5000: 0.19, 10000: 0.38, 25000: 0.96, 50000: 1.92, 100000: 3.84 } },
+      { name: 'Volatility 90 (1s)', category: 'vol_1s', lots: { 5000: 0.2, 10000: 0.3, 25000: 0.4, 50000: 0.8, 100000: 1.6 } },
+      { name: 'Volatility 100 (1s)', category: 'vol_1s', lots: { 5000: 0.35, 10000: 0.7, 25000: 1.7, 50000: 3.5, 100000: 7.0 } },
+      { name: 'Volatility 150 (1s)', category: 'vol_1s', lots: { 5000: 17, 10000: 34, 25000: 85, 50000: 170, 100000: 340 } },
+
+      { name: 'Step', category: 'step', lots: { 5000: 0.45, 10000: 0.9, 25000: 2.16, 50000: 4.32, 100000: 8.64 } },
+      { name: 'Step 200', category: 'step', lots: { 5000: 0.12, 10000: 0.23, 25000: 0.56, 50000: 1.12, 100000: 2.24 } },
+      { name: 'Step 300', category: 'step', lots: { 5000: 0.1, 10000: 0.15, 25000: 0.36, 50000: 0.72, 100000: 1.44 } },
+      { name: 'Step 400', category: 'step', lots: { 5000: 0.1, 10000: 0.16, 25000: 0.4, 50000: 0.8, 100000: 1.6 } },
+      { name: 'Step 500', category: 'step', lots: { 5000: 0.1, 10000: 0.15, 25000: 0.36, 50000: 0.72, 100000: 1.44 } },
+
+      { name: 'Jump 10', category: 'jump', lots: { 5000: 0.03, 10000: 0.06, 25000: 0.16, 50000: 0.32, 100000: 0.64 } },
+      { name: 'Jump 25', category: 'jump', lots: { 5000: 0.02, 10000: 0.03, 25000: 0.06, 50000: 0.11, 100000: 0.22 } },
+      { name: 'Jump 50', category: 'jump', lots: { 5000: 0.03, 10000: 0.05, 25000: 0.112, 50000: 0.22, 100000: 0.45 } },
+      { name: 'Jump 75', category: 'jump', lots: { 5000: 0.04, 10000: 0.08, 25000: 0.16, 50000: 0.32, 100000: 0.64 } },
+      { name: 'Jump 100', category: 'jump', lots: { 5000: 0.25, 10000: 0.5, 25000: 1.36, 50000: 2.72, 100000: 5.44 } },
+    ];
+
+    // Application State
+    const DEFAULT_SIM_DAYS = [
+      { id: 'sim-default-1', label: 'Day 1', pnl: 120 },
+      { id: 'sim-default-2', label: 'Day 2', pnl: 95 },
+      { id: 'sim-default-3', label: 'Day 3', pnl: -40 },
+    ];
+
+    function createDefaultSimDays() {
+      return DEFAULT_SIM_DAYS.map((entry) => ({ ...entry }));
+    }
+
+    let simDayCounter = 4;
+
+    const appState = {
       accountBalance: 100000,
-      challengeType: '1step', // '1step', '2step', 'payout'
-      profitTargetPercent: 10,
-      hasConsistencyAddon: false,
-      dailyProfits: [2000, 1500, 1000],
-      riskMode: 'percent', // 'percent' or 'amount'
-      riskPercent: 1,
-      riskAmount: 1000,
-      stopLossTicks: 500,
-      tickValue: 0.0005,
-      currentAsset: 'vol25'
+      challengeModel: '1step', // '1step', '2step-p1', '2step-p2', 'funded', 'instant'
+      simDays: createDefaultSimDays(),
+      openPosAsset: 2,
+      openPosAccount: 6,
+      activeChallengeAccts: 2,
+      activeFundedAccts: 1,
+      selectedAssetName: 'Volatility 25',
+      assetCategoryFilter: 'all',
+      manualRiskMode: 'percent',
+      lastCalculatedLots: 4.0,
     };
 
-    // HerConsolidation Volatility 25 Lot Table
-    const HerConsolidationLotTable = {
-      5000: 1.92,
-      10000: 3.84,
-      25000: 9.60,
-      50000: 19.20,
-      100000: 38.40,
-      200000: 76.80
-    };
-
-    // Initialize Lucide Icons
-    window.onload = function() {
-      lucide.createIcons();
-      updateAccountUI();
-      calculateConsistency();
-      calculatePositionSize();
-    };
-
-    // Navigation Tabs
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-pane').forEach(el => el.classList.add('hidden'));
-      document.getElementById(`tab-${tabId}-content`).classList.remove('hidden');
-
-      const tabs = ['consistency', 'position', 'limits'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-btn-${t}`);
-        const mobBtn = document.getElementById(`mob-tab-${t}`);
-        if (t === tabId) {
-          btn.className = "px-3 py-1.5 rounded-lg transition-all text-gold-300 bg-emerald-800/80 border border-gold-500/40 font-bold";
-          if (mobBtn) mobBtn.className = "text-gold-300 font-bold border-b-2 border-gold-400 pb-1";
-        } else {
-          btn.className = "px-3 py-1.5 rounded-lg transition-all text-slate-300 hover:text-gold-300";
-          if (mobBtn) mobBtn.className = "text-slate-400 pb-1";
-        }
+    // Currency & Lot Formatters
+    function formatUsd(amount) {
+      const num = Number(amount) || 0;
+      const absStr = Math.abs(num).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
       });
+      return num < 0 ? `-$${absStr}` : `$${absStr}`;
     }
 
-    // Account Presets
-    function setAccountSize(size) {
-      state.accountBalance = size;
-      document.getElementById('customBalanceWrapper').classList.add('hidden');
-      
-      document.querySelectorAll('.preset-btn').forEach(btn => {
-        if (parseInt(btn.getAttribute('data-size')) === size) {
-          btn.className = "preset-btn active px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-400 bg-gold-500/20 text-gold-300 shadow-md";
-        } else {
-          btn.className = "preset-btn px-3.5 py-1.5 rounded-xl border text-xs font-bold transition-all border-gold-500/30 bg-emerald-950/60 hover:border-gold-400 text-slate-200";
-        }
-      });
-
-      updateAccountUI();
-      calculateConsistency();
-      calculatePositionSize();
-    }
-
-    function toggleCustomBalanceInput() {
-      const wrapper = document.getElementById('customBalanceWrapper');
-      wrapper.classList.toggle('hidden');
-    }
-
-    function applyCustomBalance(val) {
-      const parsed = parseFloat(val);
-      if (!isNaN(parsed) && parsed > 0) {
-        state.accountBalance = parsed;
-        updateAccountUI();
-        calculateConsistency();
-        calculatePositionSize();
+    function formatLot(val) {
+      const num = Number(val) || 0;
+      if (num > 0 && num < 0.01) {
+        return num.toFixed(3);
       }
+      return num.toFixed(2);
     }
 
-    function updateAccountUI() {
-      document.getElementById('selectedBalanceDisplay').innerText = `$${state.accountBalance.toLocaleString('en-US')}`;
+    // Get Max Lot Limit for a given asset & account balance
+    function getMaxLotForAsset(assetObj, balance) {
+      if (!assetObj || !assetObj.lots) return 0;
+      if (Object.prototype.hasOwnProperty.call(assetObj.lots, balance)) {
+        return Number(assetObj.lots[balance]);
+      }
+      // Proportional scaling relative to $100,000 tier
+      const base100k = Number(assetObj.lots[100000] || 0);
+      return (balance / 100000) * base100k;
     }
 
-    // Consistency Calculations
-    function calculateConsistency() {
-      const challengeType = document.getElementById('challengeTypeSelect').value;
-      const targetPercent = parseFloat(document.getElementById('targetPercentInput').value) || 10;
-      const hasAddon = document.getElementById('consistencyAddonCheck').checked;
+    // Theme Switcher (Full UI Dark <-> Light)
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.contains('dark');
+      const header = document.getElementById('appHeader');
+      const footer = document.getElementById('appFooter');
+      const themeIcon = document.getElementById('themeIcon');
+      const themeLabel = document.getElementById('themeLabel');
 
-      state.challengeType = challengeType;
-      state.profitTargetPercent = targetPercent;
-      state.hasConsistencyAddon = hasAddon;
-
-      let maxCapRatio = 0.35; // Default 1-step or Payout
-      if (challengeType === '2step') maxCapRatio = 0.40;
-      if (hasAddon) maxCapRatio = 0.50;
-
-      const requiredTarget = state.accountBalance * (targetPercent / 100);
-      document.getElementById('requiredTargetAmount').innerText = `$${requiredTarget.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-
-      const maxDailyCapDollar = requiredTarget * maxCapRatio;
-      document.getElementById('maxDailyProfitCapDisplay').innerText = `$${maxDailyCapDollar.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-      
-      document.getElementById('capFormulaSubtext').innerText = `${(maxCapRatio * 100).toFixed(0)}% of $${requiredTarget.toLocaleString('en-US')} Target`;
-
-      // Calculate Logged Profits Matrix
-      const totalLoggedProfit = state.dailyProfits.reduce((acc, curr) => acc + curr, 0);
-      const highestSingleDay = state.dailyProfits.length > 0 ? Math.max(...state.dailyProfits) : 0;
-      
-      document.getElementById('currentLoggedProfit').innerText = `$${totalLoggedProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-      document.getElementById('highestSingleDayDisplay').innerText = `$${highestSingleDay.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
-
-      const highestPercentOfTarget = requiredTarget > 0 ? (highestSingleDay / requiredTarget) * 100 : 0;
-      document.getElementById('highestSingleDayPercent').innerText = `${highestPercentOfTarget.toFixed(1)}%`;
-
-      // Payout Specific Formula: Requested = Highest Single Day / Cap Ratio
-      const payoutRow = document.getElementById('payoutCalcRow');
-      if (challengeType === 'payout') {
-        payoutRow.classList.remove('hidden');
-        const minRequiredTotalProfit = highestSingleDay / maxCapRatio;
-        document.getElementById('requiredProfitForPayout').innerText = `$${minRequiredTotalProfit.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+      if (isDark) {
+        html.classList.remove('dark');
+        document.body.className = 'bg-[#f3f7f5] text-[#072418] min-h-screen flex flex-col justify-between transition-colors duration-300';
+        if (header) header.className = 'sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-hcGold-600/25 transition-colors duration-300';
+        if (footer) footer.className = 'bg-white border-t border-hcGold-600/20 py-4 px-4 sm:px-6 lg:px-8 mt-8 text-[#072418] transition-colors duration-300';
+        if (themeIcon) themeIcon.textContent = '🌙';
+        if (themeLabel) themeLabel.textContent = 'Dark Mode';
       } else {
-        payoutRow.classList.add('hidden');
+        html.classList.add('dark');
+        document.body.className = 'bg-hcEmerald-900 text-slate-100 dark:bg-hcEmerald-900 dark:text-slate-100 min-h-screen flex flex-col justify-between transition-colors duration-300';
+        if (header) header.className = 'sticky top-0 z-40 bg-hcEmerald-950/90 dark:bg-hcEmerald-950/90 backdrop-blur-md border-b border-hcGold-500/25 transition-colors duration-300';
+        if (footer) footer.className = 'bg-hcEmerald-950/90 dark:bg-hcEmerald-950/90 border-t border-hcGold-500/20 py-4 px-4 sm:px-6 lg:px-8 mt-8 transition-colors duration-300';
+        if (themeIcon) themeIcon.textContent = '☀️';
+        if (themeLabel) themeLabel.textContent = 'Light Mode';
       }
+      renderLotTable();
+      renderDayLogs();
+    }
 
-      // Check Compliance Breaches
-      let isBreached = false;
-      state.dailyProfits.forEach(dayProfit => {
-        if (dayProfit > maxDailyCapDollar) {
-          isBreached = true;
+    // Section Switching
+    function switchSection(sectionId) {
+      const sections = ['consistency', 'limits', 'lots', 'manual'];
+      sections.forEach((id) => {
+        const secEl = document.getElementById(`section-${id}`);
+        const btnEl = document.getElementById(`nav-${id}`);
+        if (secEl) {
+          if (id === sectionId) secEl.classList.remove('hidden');
+          else secEl.classList.add('hidden');
+        }
+        if (btnEl) {
+          if (id === sectionId) {
+            btnEl.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer hc-btn-gold';
+          } else {
+            btnEl.className = 'nav-tab px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer hc-subcard text-slate-200 hover:border-hcGold-400/50';
+          }
+        }
+      });
+    }
+
+    // Account Balance Controls
+    function setGlobalBalance(balance) {
+      appState.accountBalance = Number(balance) || 100000;
+      const customInput = document.getElementById('customBalanceInput');
+      if (customInput) customInput.value = appState.accountBalance;
+
+      document.querySelectorAll('.bal-preset').forEach((btn) => {
+        const val = Number(btn.getAttribute('data-bal'));
+        if (val === appState.accountBalance) {
+          btn.className = 'bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-400 bg-hcGold-500/20 text-hcGold-300 cursor-pointer transition-all';
+        } else {
+          btn.className = 'bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-all';
         }
       });
 
-      const statusBox = document.getElementById('complianceStatusBox');
-      const statusText = document.getElementById('complianceStatusText');
-      const statusDesc = document.getElementById('complianceStatusDesc');
+      recalculateAll();
+    }
 
-      if (isBreached) {
-        statusBox.className = "p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 text-center";
-        statusText.className = "text-lg font-black text-rose-300";
-        statusText.innerText = "BREACH DETECTED - CAP EXCEEDED";
-        statusDesc.innerText = "One or more single trading days exceed the maximum single-day consistency profit rule limit.";
+    function handleCustomBalanceInput(rawVal) {
+      const parsed = parseFloat(rawVal);
+      if (!Number.isFinite(parsed) || parsed <= 0) return;
+      appState.accountBalance = parsed;
+
+      document.querySelectorAll('.bal-preset').forEach((btn) => {
+        const val = Number(btn.getAttribute('data-bal'));
+        if (val === appState.accountBalance) {
+          btn.className = 'bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-400 bg-hcGold-500/20 text-hcGold-300 cursor-pointer transition-all';
+        } else {
+          btn.className = 'bal-preset px-3 py-1.5 rounded-xl text-xs font-bold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer transition-all';
+        }
+      });
+
+      recalculateAll();
+    }
+
+    // Challenge Model Selection
+    function selectChallengeModel(modelKey) {
+      appState.challengeModel = modelKey;
+      const targetPctInput = document.getElementById('profitTargetPctInput');
+
+      if (modelKey === '1step') {
+        if (targetPctInput) targetPctInput.value = '10';
+      } else if (modelKey === '2step-p1') {
+        if (targetPctInput) targetPctInput.value = '8';
+      } else if (modelKey === '2step-p2') {
+        if (targetPctInput) targetPctInput.value = '5';
+      }
+
+      document.querySelectorAll('.model-card').forEach((card) => {
+        card.classList.remove('border-2', 'border-hcGold-400');
+      });
+      const activeCard = document.getElementById(`model-btn-${modelKey}`);
+      if (activeCard) activeCard.classList.add('border-2', 'border-hcGold-400');
+
+      recalculateAll();
+    }
+
+    function applyPayoutExample() {
+      const reqEl = document.getElementById('requestedPayoutInput');
+      const hiEl = document.getElementById('highestDayPayoutInput');
+      if (reqEl) reqEl.value = '4000';
+      if (hiEl) hiEl.value = '1500';
+      recalculateAll();
+    }
+
+    function syncQuickDaySlider(val) {
+      const numInput = document.getElementById('quickDayTestInput');
+      if (numInput) numInput.value = val;
+      recalculateAll();
+    }
+
+    // Multi-Day Profit Simulator State & Handlers
+    function setSimFeedback(message, isError = false) {
+      const feedbackEl = document.getElementById('simFeedbackMessage');
+      if (!feedbackEl) return;
+      feedbackEl.textContent = message;
+      feedbackEl.className = isError
+        ? 'text-[11px] font-semibold text-rose-400'
+        : 'text-[11px] font-medium text-emerald-400';
+    }
+
+    function appendSimDayEntry(rawPnl, customLabel = '') {
+      const parsedPnl = typeof rawPnl === 'number' ? rawPnl : parseFloat(String(rawPnl).trim());
+      if (!Number.isFinite(parsedPnl)) {
+        setSimFeedback('Enter a valid finite PnL number.', true);
+        return false;
+      }
+
+      const nextIndex = appState.simDays.length + 1;
+      const trimmedLabel = String(customLabel || '').trim();
+      const label = trimmedLabel || `Day ${nextIndex}`;
+      const uniqueId = `sim-day-${Date.now()}-${simDayCounter++}`;
+
+      appState.simDays = [
+        ...appState.simDays,
+        {
+          id: uniqueId,
+          label,
+          pnl: parsedPnl,
+        },
+      ];
+
+      setSimFeedback(`Added ${label} (${formatUsd(parsedPnl)}).`, false);
+      recalculateAll();
+      return true;
+    }
+
+    function handleNewDayKeyDown(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        const form = document.getElementById('addDayLogForm');
+        if (form && typeof form.requestSubmit === 'function') {
+          form.requestSubmit();
+        } else {
+          handleAddDayLog(event);
+        }
+      }
+    }
+
+    function handleAddDayLog(event) {
+      if (event && typeof event.preventDefault === 'function') {
+        event.preventDefault();
+      }
+      const pnlInput = document.getElementById('newDayInput');
+      const labelInput = document.getElementById('newDayLabelInput');
+      if (!pnlInput) return;
+
+      const added = appendSimDayEntry(pnlInput.value, labelInput ? labelInput.value : '');
+      if (added) {
+        pnlInput.value = '';
+        if (labelInput) labelInput.value = '';
+        pnlInput.focus();
       } else {
-        statusBox.className = "p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 text-center";
-        statusText.className = "text-lg font-black text-emerald-300";
-        statusText.innerText = "PASSED - IN COMPLIANCE";
-        statusDesc.innerText = "All logged trading days remain within the allowable single-day consistency profit threshold.";
-      }
-
-      renderDailyTable(maxDailyCapDollar, requiredTarget);
-    }
-
-    function addDailyProfit() {
-      const input = document.getElementById('newDayProfitInput');
-      const val = parseFloat(input.value);
-      if (!isNaN(val)) {
-        state.dailyProfits.push(val);
-        input.value = '';
-        calculateConsistency();
+        pnlInput.focus();
       }
     }
 
-    function removeDailyProfit(index) {
-      state.dailyProfits.splice(index, 1);
-      calculateConsistency();
+    function addQuickDayPnl(amount) {
+      appendSimDayEntry(amount, '');
     }
 
-    function clearDailyLogs() {
-      state.dailyProfits = [];
-      calculateConsistency();
+    function updateSimDayPnl(dayId, rawValue) {
+      const parsed = parseFloat(String(rawValue).trim());
+      if (!Number.isFinite(parsed)) {
+        setSimFeedback('PnL must be a valid number.', true);
+        return;
+      }
+      appState.simDays = appState.simDays.map((entry) =>
+        entry.id === dayId ? { ...entry, pnl: parsed } : entry
+      );
+      setSimFeedback('Updated daily PnL.', false);
+      recalculateAll();
     }
 
-    function renderDailyTable(maxCapDollar, requiredTarget) {
-      const tbody = document.getElementById('dailyProfitTableBody');
-      tbody.innerHTML = '';
+    function removeDayLog(dayId) {
+      const nextDays = appState.simDays.filter((entry) => entry.id !== dayId);
+      if (nextDays.length === appState.simDays.length) return;
+      appState.simDays = nextDays;
+      setSimFeedback('Removed session.', false);
+      recalculateAll();
+    }
 
-      if (state.dailyProfits.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500">No trading days logged yet. Add your daily results above.</td></tr>`;
+    function clearAllSimDays() {
+      appState.simDays = [];
+      setSimFeedback('Cleared all simulated days.', false);
+      recalculateAll();
+    }
+
+    function resetDayLogs() {
+      simDayCounter = 4;
+      appState.simDays = createDefaultSimDays();
+      const pnlInput = document.getElementById('newDayInput');
+      const labelInput = document.getElementById('newDayLabelInput');
+      if (pnlInput) pnlInput.value = '';
+      if (labelInput) labelInput.value = '';
+      setSimFeedback('Simulator reset to default sessions.', false);
+      recalculateAll();
+    }
+
+    // Position & Account Limit Controls (Section 1.2.7)
+    function adjustAssetPositions(delta) {
+      appState.openPosAsset = Math.max(0, Math.min(20, appState.openPosAsset + delta));
+      recalculateLimits();
+    }
+
+    function adjustAccountPositions(delta) {
+      appState.openPosAccount = Math.max(0, Math.min(40, appState.openPosAccount + delta));
+      recalculateLimits();
+    }
+
+    function adjustChallengeAccounts(delta) {
+      appState.activeChallengeAccts = Math.max(0, Math.min(12, appState.activeChallengeAccts + delta));
+      recalculateLimits();
+    }
+
+    function adjustFundedAccounts(delta) {
+      appState.activeFundedAccts = Math.max(0, Math.min(6, appState.activeFundedAccts + delta));
+      recalculateLimits();
+    }
+
+    function recalculateLimits() {
+      const assetCountEl = document.getElementById('openPosAssetCount');
+      const acctCountEl = document.getElementById('openPosAccountCount');
+      const assetBadgeEl = document.getElementById('posAssetBadge');
+      const acctBadgeEl = document.getElementById('posAccountBadge');
+      const posSummaryEl = document.getElementById('positionLimitsSummary');
+
+      const chCountEl = document.getElementById('activeChallengeAcctCount');
+      const fnCountEl = document.getElementById('activeFundedAcctCount');
+      const chBadgeEl = document.getElementById('challengeAcctBadge');
+      const fnBadgeEl = document.getElementById('fundedAcctBadge');
+      const acctSummaryEl = document.getElementById('accountLimitsSummary');
+
+      const assetOk = appState.openPosAsset <= 5;
+      const acctOk = appState.openPosAccount <= 13;
+
+      if (assetCountEl) assetCountEl.textContent = String(appState.openPosAsset);
+      if (acctCountEl) acctCountEl.textContent = String(appState.openPosAccount);
+
+      if (assetBadgeEl) {
+        assetBadgeEl.textContent = assetOk ? `${appState.openPosAsset} / 5 OK` : `${appState.openPosAsset} / 5 BREACH`;
+        assetBadgeEl.className = assetOk
+          ? 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+          : 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-rose-500/25 text-rose-300 border border-rose-400/40';
+      }
+
+      if (acctBadgeEl) {
+        acctBadgeEl.textContent = acctOk ? `${appState.openPosAccount} / 13 OK` : `${appState.openPosAccount} / 13 BREACH`;
+        acctBadgeEl.className = acctOk
+          ? 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+          : 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-rose-500/25 text-rose-300 border border-rose-400/40';
+      }
+
+      if (posSummaryEl) {
+        if (assetOk && acctOk) {
+          const remAsset = Math.max(0, 5 - appState.openPosAsset);
+          const remAcct = Math.max(0, 13 - appState.openPosAccount);
+          posSummaryEl.className = 'rounded-xl p-3.5 text-xs font-semibold bg-emerald-950/50 border border-emerald-400/30 text-emerald-200';
+          posSummaryEl.textContent = `Compliant: ${appState.openPosAsset}/5 per-asset and ${appState.openPosAccount}/13 total account positions open (up to ${remAsset} more on asset, ${remAcct} more on account).`;
+        } else {
+          posSummaryEl.className = 'rounded-xl p-3.5 text-xs font-semibold bg-rose-950/60 border border-rose-400/40 text-rose-200';
+          posSummaryEl.textContent = `Limit Exceeded: Reduce open positions so per-asset ≤ 5 and total account open positions ≤ 13.`;
+        }
+      }
+
+      const chOk = appState.activeChallengeAccts <= 4;
+      const fnOk = appState.activeFundedAccts <= 1;
+
+      if (chCountEl) chCountEl.textContent = String(appState.activeChallengeAccts);
+      if (fnCountEl) fnCountEl.textContent = String(appState.activeFundedAccts);
+
+      if (chBadgeEl) {
+        chBadgeEl.textContent = chOk ? `${appState.activeChallengeAccts} / 4 OK` : `${appState.activeChallengeAccts} / 4 LIMIT`;
+        chBadgeEl.className = chOk
+          ? 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+          : 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-rose-500/25 text-rose-300 border border-rose-400/40';
+      }
+
+      if (fnBadgeEl) {
+        fnBadgeEl.textContent = fnOk ? `${appState.activeFundedAccts} / 1 OK` : `${appState.activeFundedAccts} / 1 LIMIT`;
+        fnBadgeEl.className = fnOk
+          ? 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30'
+          : 'px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-rose-500/25 text-rose-300 border border-rose-400/40';
+      }
+
+      if (acctSummaryEl) {
+        if (chOk && fnOk) {
+          acctSummaryEl.className = 'rounded-xl p-3.5 text-xs font-semibold bg-emerald-950/50 border border-emerald-400/30 text-emerald-200';
+          acctSummaryEl.textContent = `Trader account limits respected: ${appState.activeChallengeAccts}/4 challenge accounts and ${appState.activeFundedAccts}/1 live funded account.`;
+        } else {
+          acctSummaryEl.className = 'rounded-xl p-3.5 text-xs font-semibold bg-rose-950/60 border border-rose-400/40 text-rose-200';
+          acctSummaryEl.textContent = `Account Limit Exceeded: Traders may hold at most 4 challenge accounts and 1 live (funded) account at one time.`;
+        }
+      }
+    }
+
+    // 40-Asset Table & Compliance Tester (Section 1.2.8)
+    function populateAssetSelects() {
+      const lotSelect = document.getElementById('lotTesterAssetSelect');
+      const manualSelect = document.getElementById('manualRefAssetSelect');
+      const optionsHtml = ASSETS_DATA.map(
+        (a) => `<option value="${a.name}" ${a.name === appState.selectedAssetName ? 'selected' : ''}>${a.name}</option>`
+      ).join('');
+
+      if (lotSelect) lotSelect.innerHTML = optionsHtml;
+      if (manualSelect) manualSelect.innerHTML = optionsHtml;
+    }
+
+    function handleLotAssetDropdown(assetName) {
+      appState.selectedAssetName = assetName;
+      const manualSelect = document.getElementById('manualRefAssetSelect');
+      if (manualSelect) manualSelect.value = assetName;
+      recalculateAll();
+    }
+
+    function handleManualRefAssetChange(assetName) {
+      appState.selectedAssetName = assetName;
+      const lotSelect = document.getElementById('lotTesterAssetSelect');
+      if (lotSelect) lotSelect.value = assetName;
+      recalculateAll();
+    }
+
+    function setAssetCategory(catKey) {
+      appState.assetCategoryFilter = catKey;
+      document.querySelectorAll('.cat-filter-btn').forEach((btn) => {
+        if (btn.getAttribute('data-cat') === catKey) {
+          btn.className = 'cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-bold hc-btn-gold cursor-pointer';
+        } else {
+          btn.className = 'cat-filter-btn px-3 py-1.5 rounded-xl text-xs font-semibold border border-hcGold-500/30 hc-subcard hover:border-hcGold-400 cursor-pointer';
+        }
+      });
+      renderLotTable();
+    }
+
+    function renderLotTable() {
+      const tbody = document.getElementById('maxLotsTableBody');
+      const searchInput = document.getElementById('assetSearchInput');
+      const customNotice = document.getElementById('customScaleNotice');
+      const customHeader = document.getElementById('customLotColHeader');
+
+      if (!tbody) return;
+
+      const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+      const cat = appState.assetCategoryFilter;
+      const standardTiers = [5000, 10000, 25000, 50000, 100000];
+      const isCustomBalance = !standardTiers.includes(appState.accountBalance);
+
+      if (customNotice) {
+        if (isCustomBalance) customNotice.classList.remove('hidden');
+        else customNotice.classList.add('hidden');
+      }
+
+      if (customHeader) {
+        customHeader.textContent = `${formatUsd(appState.accountBalance).replace('.00', '')}`;
+        if (isCustomBalance) customHeader.classList.remove('hidden');
+        else customHeader.classList.add('hidden');
+      }
+
+      const filtered = ASSETS_DATA.filter((item) => {
+        const matchesCat = cat === 'all' || item.category === cat;
+        const matchesSearch = !query || item.name.toLowerCase().includes(query);
+        return matchesCat && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="${isCustomBalance ? 7 : 6}" class="py-6 px-4 text-center text-xs text-slate-400">
+              No matching trading asset found. Try clearing your search filter.
+            </td>
+          </tr>
+        `;
         return;
       }
 
-      state.dailyProfits.forEach((profit, idx) => {
-        const percentOfTarget = requiredTarget > 0 ? (profit / requiredTarget) * 100 : 0;
-        const isBreach = profit > maxCapDollar;
+      const isDark = document.documentElement.classList.contains('dark');
 
-        const row = document.createElement('tr');
-        row.className = "hover:bg-gold-500/5 transition-colors";
-        row.innerHTML = `
-          <td class="p-3 font-semibold">Day ${idx + 1}</td>
-          <td class="p-3 font-bold ${profit >= 0 ? 'text-emerald-400' : 'text-rose-400'}">$${profit.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
-          <td class="p-3 font-medium text-gold-300">${percentOfTarget.toFixed(1)}%</td>
-          <td class="p-3">
-            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${isBreach ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'}">
-              ${isBreach ? 'Cap Breached' : 'Passed'}
-            </span>
-          </td>
-          <td class="p-3 text-right">
-            <button onclick="removeDailyProfit(${idx})" class="text-slate-400 hover:text-rose-400 p-1">
-              <i data-lucide="x" class="w-4 h-4"></i>
-            </button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
+      tbody.innerHTML = filtered
+        .map((item) => {
+          const isSelected = item.name === appState.selectedAssetName;
+          const activeMax = getMaxLotForAsset(item, appState.accountBalance);
+          const rowBg = isSelected
+            ? isDark
+              ? 'bg-hcGold-500/15'
+              : 'bg-amber-50'
+            : isDark
+            ? 'hover:bg-hcEmerald-800/40'
+            : 'hover:bg-emerald-50/70';
 
-      lucide.createIcons();
+          return `
+            <tr onclick="handleLotAssetDropdown('${item.name.replace(/'/g, "\\'")}')" class="${rowBg} cursor-pointer transition-colors">
+              <td class="py-2.5 px-3.5 font-semibold whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <span>${item.name}</span>
+                  ${isSelected ? '<span class="px-1.5 py-0.5 text-[10px] font-bold rounded bg-hcGold-500/25 text-hcGold-300">Selected</span>' : ''}
+                </div>
+              </td>
+              <td class="py-2.5 px-3 font-mono text-right whitespace-nowrap">${formatLot(item.lots[5000])}</td>
+              <td class="py-2.5 px-3 font-mono text-right whitespace-nowrap">${formatLot(item.lots[10000])}</td>
+              <td class="py-2.5 px-3 font-mono text-right whitespace-nowrap">${formatLot(item.lots[25000])}</td>
+              <td class="py-2.5 px-3 font-mono text-right whitespace-nowrap">${formatLot(item.lots[50000])}</td>
+              <td class="py-2.5 px-3 font-mono text-right whitespace-nowrap">${formatLot(item.lots[100000])}</td>
+              ${
+                isCustomBalance
+                  ? `<td class="py-2.5 px-3.5 font-mono font-bold text-right text-emerald-400 whitespace-nowrap">${formatLot(activeMax)}</td>`
+                  : ''
+              }
+            </tr>
+          `;
+        })
+        .join('');
     }
 
-    // Risk & Position Sizing Calculator
-    function setRiskMode(mode) {
-      state.riskMode = mode;
-      const percentWrapper = document.getElementById('riskPercentWrapper');
-      const amountWrapper = document.getElementById('riskAmountWrapper');
-      const percentBtn = document.getElementById('riskModePercentBtn');
-      const amountBtn = document.getElementById('riskModeAmountBtn');
+    // Manual Trading Risk Position Calculator
+    function setManualRiskMode(mode) {
+      appState.manualRiskMode = mode;
+      const pctGroup = document.getElementById('manualRiskPctGroup');
+      const usdGroup = document.getElementById('manualRiskUsdGroup');
+      const pctBtn = document.getElementById('riskModePctBtn');
+      const usdBtn = document.getElementById('riskModeUsdBtn');
 
       if (mode === 'percent') {
-        percentWrapper.classList.remove('hidden');
-        amountWrapper.classList.add('hidden');
-        percentBtn.className = "p-2 rounded-xl border border-gold-400 bg-gold-500/20 text-gold-300 font-bold text-center";
-        amountBtn.className = "p-2 rounded-xl border border-gold-500/20 bg-emerald-950 text-slate-300 font-bold text-center";
+        if (pctGroup) pctGroup.classList.remove('hidden');
+        if (usdGroup) usdGroup.classList.add('hidden');
+        if (pctBtn) pctBtn.className = 'px-2.5 py-1 rounded-md font-bold hc-btn-gold cursor-pointer';
+        if (usdBtn) usdBtn.className = 'px-2.5 py-1 rounded-md font-semibold text-slate-300 cursor-pointer';
       } else {
-        percentWrapper.classList.add('hidden');
-        amountWrapper.classList.remove('hidden');
-        amountBtn.className = "p-2 rounded-xl border border-gold-400 bg-gold-500/20 text-gold-300 font-bold text-center";
-        percentBtn.className = "p-2 rounded-xl border border-gold-500/20 bg-emerald-950 text-slate-300 font-bold text-center";
+        if (pctGroup) pctGroup.classList.add('hidden');
+        if (usdGroup) usdGroup.classList.remove('hidden');
+        if (usdBtn) usdBtn.className = 'px-2.5 py-1 rounded-md font-bold hc-btn-gold cursor-pointer';
+        if (pctBtn) pctBtn.className = 'px-2.5 py-1 rounded-md font-semibold text-slate-300 cursor-pointer';
       }
-      calculatePositionSize();
+      recalculateAll();
     }
 
-    function handleAssetChange() {
-      const asset = document.getElementById('assetSelect').value;
-      const tickInput = document.getElementById('tickValueInput');
-      const assetNote = document.getElementById('assetNote');
-
-      state.currentAsset = asset;
-
-      if (asset === 'vol25') {
-        tickInput.value = 0.0005;
-        assetNote.innerText = "Specialized Deriv Volatility 25: $0.0005 per tick / 0.5 unit change.";
-      } else if (asset === 'forex') {
-        tickInput.value = 10.0;
-        assetNote.innerText = "Standard Forex Lot ($10 per pip per standard lot).";
-      } else if (asset === 'indices') {
-        tickInput.value = 1.0;
-        assetNote.innerText = "Indices standard $1 per point move per unit lot.";
-      } else {
-        tickInput.value = 1.0;
-        assetNote.innerText = "Cryptocurrency standard point value.";
-      }
-      calculatePositionSize();
+    function setRiskPctPreset(pct) {
+      const pctInput = document.getElementById('manualRiskPctInput');
+      if (pctInput) pctInput.value = String(pct);
+      setManualRiskMode('percent');
     }
 
-    function calculatePositionSize() {
-      const slTicks = parseFloat(document.getElementById('stopLossInput').value) || 1;
-      const tickVal = parseFloat(document.getElementById('tickValueInput').value) || 0.0005;
+    function applyInstrumentPreset(type, pipVal) {
+      const pipInput = document.getElementById('manualPipValueInput');
+      const unitsInput = document.getElementById('manualUnitsMultiplierInput');
+      const slInput = document.getElementById('manualStopLossInput');
 
-      let dollarRisk = 0;
-      if (state.riskMode === 'percent') {
-        const pct = parseFloat(document.getElementById('riskPercentInput').value) || 1;
-        dollarRisk = state.accountBalance * (pct / 100);
+      if (pipInput) pipInput.value = String(pipVal);
+      if (type === 'deriv_tick') {
+        if (unitsInput) unitsInput.value = '1';
+        if (slInput && Number(slInput.value) < 50) slInput.value = '500';
+      } else if (type === 'forex_std') {
+        if (unitsInput) unitsInput.value = '100000';
       } else {
-        dollarRisk = parseFloat(document.getElementById('riskAmountInput').value) || 1000;
+        if (unitsInput) unitsInput.value = '1000';
       }
-
-      // Lot Sizing Formula: Risk Amount / (SL Ticks * Tick Value)
-      const calculatedLots = dollarRisk / (slTicks * tickVal);
-      document.getElementById('calculatedLotSize').innerText = `${calculatedLots.toFixed(2)} Lots`;
-
-      // Get Maximum Lot Limit based on HerConsolidation Table or Auto-scale
-      let maxLots = HerConsolidationLotTable[state.accountBalance];
-      if (!maxLots) {
-        // Linear Scaling Formula based on $100k -> 38.40 lots
-        maxLots = (state.accountBalance / 100000) * 38.40;
-      }
-
-      document.getElementById('maxAllowedLotSize').innerText = `${maxLots.toFixed(2)} Lots`;
-
-      // Validate Warning
-      const warningBox = document.getElementById('lotWarningBox');
-      const warningIcon = document.getElementById('lotWarningIcon');
-      const warningTitle = document.getElementById('lotWarningTitle');
-      const warningDesc = document.getElementById('lotWarningDesc');
-
-      if (calculatedLots > maxLots) {
-        warningBox.className = "mt-4 p-4 rounded-xl bg-rose-950/80 border border-rose-500/50 flex items-start space-x-3";
-        warningTitle.className = "text-xs font-bold text-rose-300";
-        warningTitle.innerText = "LOT LIMIT EXCEEDED BREACH RISK";
-        warningDesc.innerText = `Calculated position (${calculatedLots.toFixed(2)} lots) exceeds HerConsolidation max allowed lot limit (${maxLots.toFixed(2)} lots) for a $${state.accountBalance.toLocaleString()} account.`;
-      } else {
-        warningBox.className = "mt-4 p-4 rounded-xl bg-emerald-950 border border-emerald-500/40 flex items-start space-x-3";
-        warningTitle.className = "text-xs font-bold text-emerald-400";
-        warningTitle.innerText = "Position Size Within Limits";
-        warningDesc.innerText = `Calculated position (${calculatedLots.toFixed(2)} lots) is safely below the maximum allowable lot limit (${maxLots.toFixed(2)} lots).`;
-      }
+      recalculateAll();
     }
 
-    // Light / Dark Theme Switcher
-    function toggleTheme() {
-      const html = document.documentElement;
-      const themeIcon = document.getElementById('themeIcon');
-      
-      if (html.classList.contains('dark')) {
-        html.classList.remove('dark');
-        document.body.className = "bg-slate-100 text-slate-900 min-h-screen transition-colors duration-300 flex flex-col justify-between";
-      } else {
-        html.classList.add('dark');
-        document.body.className = "bg-[#041f17] dark:bg-[#041f17] text-slate-100 min-h-screen transition-colors duration-300 flex flex-col justify-between";
+    function applyCalculatedLotToTester() {
+      const plannedInput = document.getElementById('plannedLotInput');
+      if (plannedInput) {
+        plannedInput.value = Number(appState.lastCalculatedLots || 0).toFixed(2);
       }
+      switchSection('lots');
+      recalculateAll();
     }
+
+    // Master Recalculation Engine
+    function recalculateAll() {
+      const bal = appState.accountBalance;
+      const model = appState.challengeModel;
+      const addonEnabled = Boolean(document.getElementById('consistencyAddonToggle')?.checked);
+
+      // Update Global Header & Balance Labels
+      const globalBalEl = document.getElementById('globalBalanceDisplay');
+      const globalNoteEl = document.getElementById('globalBalanceNote');
+      const headerBalPill = document.getElementById('headerBalancePill');
+      const headerModelPill = document.getElementById('headerModelPill');
+
+      if (globalBalEl) globalBalEl.textContent = formatUsd(bal).replace('.00', '');
+      if (headerBalPill) headerBalPill.textContent = formatUsd(bal).replace('.00', '');
+
+      const tiers = [5000, 10000, 25000, 50000, 100000, 200000];
+      if (globalNoteEl) {
+        globalNoteEl.textContent = tiers.includes(bal)
+          ? `Standard ${formatUsd(bal).replace('.00', '')} prop account tier`
+          : `Custom prop account balance (${formatUsd(bal)})`;
+      }
+
+      // Show/Hide Instant Banner & Funded Payout Panel
+      const instantBanner = document.getElementById('instantComingSoonBanner');
+      const fundedPanel = document.getElementById('fundedPayoutPanel');
+      const targetPctBox = document.getElementById('targetPercentBox');
+
+      if (instantBanner) {
+        if (model === 'instant') instantBanner.classList.remove('hidden');
+        else instantBanner.classList.add('hidden');
+      }
+
+      if (fundedPanel) {
+        if (model === 'funded') fundedPanel.classList.remove('hidden');
+        else fundedPanel.classList.add('hidden');
+      }
+
+      if (targetPctBox) {
+        if (model === 'funded') targetPctBox.classList.add('opacity-60');
+        else targetPctBox.classList.remove('opacity-60');
+      }
+
+      // Determine Consistency Ratio & Benchmark Base
+      let consistencyPct = 35;
+      let modelTitle = '1-Step Challenge (10% Target • 35% Consistency)';
+      let modelFormula = 'Max allowed single-day profit = 35% × Profit Target';
+      let pillText = '1-Step (35%)';
+
+      if (model === '1step') {
+        consistencyPct = addonEnabled ? 50 : 35;
+        modelTitle = '1-Step Challenge (Section 1.2.4 & 1.2.5)';
+        modelFormula = addonEnabled
+          ? 'Consistency Add-On Active: Max single day = 50% × Profit Target'
+          : 'Standard Rule: Max single day = 35% × Profit Target';
+        pillText = addonEnabled ? '1-Step (50% Add-On)' : '1-Step (35%)';
+      } else if (model === '2step-p1') {
+        consistencyPct = addonEnabled ? 50 : 40;
+        modelTitle = '2-Step Challenge — Phase 1 (8% Target)';
+        modelFormula = addonEnabled
+          ? 'Consistency Add-On Active: Max single day = 50% × Phase 1 Profit Target'
+          : 'Standard 2-Step Rule: Max single day = 40% × Phase 1 Profit Target';
+        pillText = addonEnabled ? '2-Step P1 (50% Add-On)' : '2-Step P1 (40%)';
+      } else if (model === '2step-p2') {
+        consistencyPct = addonEnabled ? 50 : 40;
+        modelTitle = '2-Step Challenge — Phase 2 (5% Target)';
+        modelFormula = addonEnabled
+          ? 'Consistency Add-On Active: Max single day = 50% × Phase 2 Profit Target'
+          : 'Standard 2-Step Rule: Max single day = 40% × Phase 2 Profit Target';
+        pillText = addonEnabled ? '2-Step P2 (50% Add-On)' : '2-Step P2 (40%)';
+      } else if (model === 'funded') {
+        consistencyPct = addonEnabled ? 50 : 35;
+        modelTitle = 'Funded Phase — Payout Consistency Rule';
+        modelFormula = addonEnabled
+          ? 'Add-On Active: Highest single trading day ≤ 50% of requested payout'
+          : 'Standard Payout Rule: Highest single trading day ≤ 35% of requested payout';
+        pillText = addonEnabled ? 'Funded (50% Payout)' : 'Funded (35% Payout)';
+      } else if (model === 'instant') {
+        consistencyPct = addonEnabled ? 50 : 35;
+        modelTitle = 'Instant Challenge (Coming Soon)';
+        modelFormula = 'Previewing baseline evaluation metrics while Instant Challenge is coming soon';
+        pillText = 'Instant (Soon)';
+      }
+
+      if (headerModelPill) headerModelPill.textContent = pillText;
+
+      const titleEl = document.getElementById('activeModelTitle');
+      const formulaEl = document.getElementById('activeModelFormula');
+      const badgeEl = document.getElementById('activeCapBadge');
+      if (titleEl) titleEl.textContent = modelTitle;
+      if (formulaEl) formulaEl.textContent = modelFormula;
+      if (badgeEl) badgeEl.textContent = `Daily Cap: ${consistencyPct.toFixed(1)}%`;
+
+      const targetPct = Math.max(0, parseFloat(document.getElementById('profitTargetPctInput')?.value) || 0);
+      const profitTargetUsd = bal * (targetPct / 100);
+
+      const targetDollarDisp = document.getElementById('profitTargetDollarDisplay');
+      if (targetDollarDisp) targetDollarDisp.textContent = formatUsd(profitTargetUsd);
+
+      const requestedPayout = Math.max(0, parseFloat(document.getElementById('requestedPayoutInput')?.value) || 0);
+      const highestDayPayout = Math.max(0, parseFloat(document.getElementById('highestDayPayoutInput')?.value) || 0);
+
+      const capRate = consistencyPct / 100;
+      const benchmarkUsd = model === 'funded' ? requestedPayout : profitTargetUsd;
+      const maxSingleDayUsd = benchmarkUsd * capRate;
+      const safeBufferUsd = maxSingleDayUsd * 0.97;
+
+      // Funded Payout Verdicts
+      if (model === 'funded') {
+        const payoutVerdictBox = document.getElementById('payoutVerdictBox');
+        const payoutVerdictTitle = document.getElementById('payoutVerdictTitle');
+        const payoutAllowedDayCap = document.getElementById('payoutAllowedDayCap');
+        const payoutVerdictDetail = document.getElementById('payoutVerdictDetail');
+
+        const minRequiredPayout = capRate > 0 ? highestDayPayout / capRate : 0;
+        const isEligible = highestDayPayout <= maxSingleDayUsd;
+
+        if (payoutAllowedDayCap) {
+          payoutAllowedDayCap.textContent = `Max Day: ${formatUsd(maxSingleDayUsd)}`;
+        }
+
+        if (payoutVerdictBox && payoutVerdictTitle && payoutVerdictDetail) {
+          if (isEligible) {
+            payoutVerdictBox.className = 'rounded-xl p-3.5 border text-xs space-y-1.5 bg-emerald-950/50 border-emerald-400/40 text-emerald-200';
+            payoutVerdictTitle.textContent = `Payout Approved (${formatUsd(requestedPayout)} Eligible)`;
+            payoutVerdictDetail.textContent = `Highest trading day (${formatUsd(highestDayPayout)}) is within the ${consistencyPct}% limit (${formatUsd(maxSingleDayUsd)}) of your ${formatUsd(requestedPayout)} payout request.`;
+          } else {
+            payoutVerdictBox.className = 'rounded-xl p-3.5 border text-xs space-y-1.5 bg-amber-950/50 border-amber-400/45 text-amber-100';
+            payoutVerdictTitle.textContent = 'Keep Trading — Consistency Adjustment Needed';
+            payoutVerdictDetail.textContent = `Highest day (${formatUsd(highestDayPayout)}) exceeds ${consistencyPct}% of ${formatUsd(requestedPayout)} (${formatUsd(maxSingleDayUsd)}). Minimum required payout/profit target = ${formatUsd(highestDayPayout)} ÷ ${capRate.toFixed(2)} = ${formatUsd(minRequiredPayout)}.`;
+          }
+        }
+      }
+
+      // Main 3 Metric Cards
+      const m1Label = document.getElementById('metric1Label');
+      const m1Val = document.getElementById('metric1Value');
+      const m1Sub = document.getElementById('metric1Sub');
+      const m2Val = document.getElementById('metric2Value');
+      const m2Sub = document.getElementById('metric2Sub');
+      const m3Val = document.getElementById('metric3Value');
+
+      if (model === 'funded') {
+        if (m1Label) m1Label.textContent = 'Requested Payout';
+        if (m1Val) m1Val.textContent = formatUsd(requestedPayout);
+        if (m1Sub) m1Sub.textContent = `${((requestedPayout / Math.max(1, bal)) * 100).toFixed(2)}% of ${formatUsd(bal).replace('.00', '')}`;
+        if (m2Sub) m2Sub.textContent = `${consistencyPct}% of ${formatUsd(requestedPayout)} payout`;
+      } else {
+        if (m1Label) m1Label.textContent = 'Profit Target ($)';
+        if (m1Val) m1Val.textContent = formatUsd(profitTargetUsd);
+        if (m1Sub) m1Sub.textContent = `${targetPct.toFixed(1)}% of ${formatUsd(bal).replace('.00', '')}`;
+        if (m2Sub) m2Sub.textContent = `${consistencyPct}% of ${formatUsd(profitTargetUsd)} target`;
+      }
+
+      if (m2Val) m2Val.textContent = formatUsd(maxSingleDayUsd);
+      if (m3Val) m3Val.textContent = formatUsd(safeBufferUsd);
+
+      // Quick Single-Day Profit Stress Tester
+      const quickInput = document.getElementById('quickDayTestInput');
+      const quickSlider = document.getElementById('quickDayTestSlider');
+      const quickShareBadge = document.getElementById('quickDayShareBadge');
+      const quickResultBox = document.getElementById('quickDayResultBox');
+
+      const testDayProfit = Math.max(0, parseFloat(quickInput?.value) || 0);
+      if (quickSlider) {
+        const sliderMax = Math.max(5000, Math.ceil((maxSingleDayUsd * 1.6) / 100) * 100);
+        quickSlider.max = String(sliderMax);
+        quickSlider.value = String(Math.min(testDayProfit, sliderMax));
+      }
+
+      const sharePct = benchmarkUsd > 0 ? (testDayProfit / benchmarkUsd) * 100 : 0;
+      if (quickShareBadge) {
+        quickShareBadge.textContent = `${sharePct.toFixed(1)}% of ${model === 'funded' ? 'payout' : 'target'}`;
+      }
+
+      if (quickResultBox) {
+        if (testDayProfit <= maxSingleDayUsd) {
+          quickResultBox.className = 'text-xs font-semibold pt-1 text-emerald-400';
+          quickResultBox.textContent = `✓ Within ${consistencyPct}% limit (${formatUsd(maxSingleDayUsd)} max). Remaining daily headroom: ${formatUsd(maxSingleDayUsd - testDayProfit)}.`;
+        } else {
+          const neededTarget = capRate > 0 ? testDayProfit / capRate : 0;
+          quickResultBox.className = 'text-xs font-semibold pt-1 text-rose-400';
+          quickResultBox.textContent = `✕ Exceeds ${consistencyPct}% max (${formatUsd(maxSingleDayUsd)}) by ${formatUsd(testDayProfit - maxSingleDayUsd)}. Requires ${formatUsd(neededTarget)} total ${model === 'funded' ? 'payout' : 'target'} to satisfy ${consistencyPct}%.`;
+        }
+      }
+
+      // Render Multi-Day Profit Simulator
+      renderDayLogs(maxSingleDayUsd, benchmarkUsd, model === 'funded' ? 'Payout' : 'Target');
+
+      // Recalculate 40-Asset Planned Lot Compliance Tester
+      const selectedAssetObj = ASSETS_DATA.find((a) => a.name === appState.selectedAssetName) || ASSETS_DATA[15];
+      const assetMaxLot = getMaxLotForAsset(selectedAssetObj, bal);
+      const plannedLot = Math.max(0, parseFloat(document.getElementById('plannedLotInput')?.value) || 0);
+
+      const plannedTitle = document.getElementById('plannedLotVerdictTitle');
+      const plannedDetail = document.getElementById('plannedLotVerdictDetail');
+      const plannedCard = document.getElementById('plannedLotVerdictCard');
+
+      if (plannedTitle && plannedDetail && plannedCard) {
+        if (plannedLot <= assetMaxLot) {
+          plannedCard.className = 'rounded-xl p-3.5 border bg-emerald-950/50 border-emerald-400/35';
+          plannedTitle.className = 'text-xs font-bold text-emerald-300';
+          plannedTitle.textContent = 'Within Max Lot Limit';
+          plannedDetail.textContent = `${formatLot(plannedLot)} lots ≤ ${formatLot(assetMaxLot)} max on ${selectedAssetObj.name} (${formatUsd(bal).replace('.00', '')})`;
+        } else {
+          plannedCard.className = 'rounded-xl p-3.5 border bg-rose-950/60 border-rose-400/40';
+          plannedTitle.className = 'text-xs font-bold text-rose-300';
+          plannedTitle.textContent = 'Exceeds Asset Max Lot Limit';
+          plannedDetail.textContent = `${formatLot(plannedLot)} lots > ${formatLot(assetMaxLot)} max on ${selectedAssetObj.name} (${formatUsd(bal).replace('.00', '')})`;
+        }
+      }
+
+      // Recalculate Manual Trading Risk Position Calculator
+      const riskUsd =
+        appState.manualRiskMode === 'percent'
+          ? bal * ((Math.max(0, parseFloat(document.getElementById('manualRiskPctInput')?.value) || 0)) / 100)
+          : Math.max(0, parseFloat(document.getElementById('manualRiskUsdInput')?.value) || 0);
+
+      const slDist = Math.max(0.0001, parseFloat(document.getElementById('manualStopLossInput')?.value) || 1);
+      const pipVal = Math.max(0.000001, parseFloat(document.getElementById('manualPipValueInput')?.value) || 1);
+      const unitsMult = Math.max(1, parseFloat(document.getElementById('manualUnitsMultiplierInput')?.value) || 1000);
+
+      const calcLots = riskUsd / (slDist * pipVal);
+      appState.lastCalculatedLots = calcLots;
+      const calcUnits = calcLots * unitsMult;
+
+      const calcLotsEl = document.getElementById('manualCalcLots');
+      const calcUnitsEl = document.getElementById('manualCalcUnits');
+      const calcRiskEl = document.getElementById('manualCalcRiskUsd');
+      const assetMaxLotEl = document.getElementById('manualAssetMaxLot');
+      const guardrailBox = document.getElementById('manualLotGuardrailBox');
+      const guardrailTitle = document.getElementById('manualGuardrailTitle');
+      const guardrailDesc = document.getElementById('manualGuardrailDesc');
+
+      if (calcLotsEl) calcLotsEl.textContent = `${formatLot(calcLots)} Lots`;
+      if (calcUnitsEl) calcUnitsEl.textContent = `≈ ${Math.round(calcUnits).toLocaleString('en-US')} Units`;
+      if (calcRiskEl) calcRiskEl.textContent = formatUsd(riskUsd);
+      if (assetMaxLotEl) assetMaxLotEl.textContent = `${formatLot(assetMaxLot)} Lots`;
+
+      if (guardrailBox && guardrailTitle && guardrailDesc) {
+        if (calcLots <= assetMaxLot) {
+          guardrailBox.className = 'rounded-xl p-4 border text-xs space-y-1 bg-emerald-950/50 border-emerald-400/35 text-emerald-200';
+          guardrailTitle.textContent = `Within ${selectedAssetObj.name} Max Lot Cap`;
+          guardrailDesc.textContent = `Recommended size (${formatLot(calcLots)} lots) is within the ${formatLot(assetMaxLot)} lot maximum for a ${formatUsd(bal).replace('.00', '')} account.`;
+        } else {
+          guardrailBox.className = 'rounded-xl p-4 border text-xs space-y-1 bg-rose-950/60 border-rose-400/40 text-rose-200';
+          guardrailTitle.textContent = `Exceeds ${selectedAssetObj.name} Max Lot Cap`;
+          guardrailDesc.textContent = `Recommended size (${formatLot(calcLots)} lots) exceeds the ${formatLot(assetMaxLot)} lot cap. Widen your stop-loss or lower risk %/$.`;
+        }
+      }
+
+      renderLotTable();
+      recalculateLimits();
+    }
+
+    function renderDayLogs(maxSingleDayUsd, benchmarkUsd, benchmarkLabel) {
+      const tbody = document.getElementById('dayLogTableBody');
+      const totalEl = document.getElementById('simTotalProfit');
+      const highestEl = document.getElementById('simHighestDay');
+      const statusEl = document.getElementById('simStatusBadge');
+      const progLabel = document.getElementById('simProgressLabel');
+      const progPct = document.getElementById('simProgressPct');
+      const progBar = document.getElementById('simProgressBar');
+
+      const logs = Array.isArray(appState.simDays) ? appState.simDays : [];
+      const totalProfit = logs.reduce((acc, item) => acc + (Number(item.pnl) || 0), 0);
+      const highestDay = logs.length > 0 ? Math.max(...logs.map((item) => Number(item.pnl) || 0)) : 0;
+      const hasBreach = logs.some((item) => (Number(item.pnl) || 0) > maxSingleDayUsd);
+
+      if (totalEl) {
+        totalEl.textContent = formatUsd(totalProfit);
+        totalEl.className = `text-sm font-extrabold font-mono mt-0.5 ${totalProfit >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      }
+      if (highestEl) highestEl.textContent = formatUsd(highestDay);
+
+      if (statusEl) {
+        if (hasBreach) {
+          statusEl.textContent = 'BREACH';
+          statusEl.className = 'text-xs font-extrabold mt-1 text-rose-400';
+        } else {
+          statusEl.textContent = 'COMPLIANT';
+          statusEl.className = 'text-xs font-extrabold mt-1 text-emerald-400';
+        }
+      }
+
+      const pctDone = benchmarkUsd > 0 ? Math.max(0, (totalProfit / benchmarkUsd) * 100) : 0;
+      if (progLabel) progLabel.textContent = `Progress toward ${benchmarkLabel} (${formatUsd(benchmarkUsd)})`;
+      if (progPct) progPct.textContent = `${pctDone.toFixed(1)}%`;
+      if (progBar) progBar.style.width = `${Math.min(100, pctDone)}%`;
+
+      if (!tbody) return;
+      if (logs.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" class="py-5 px-3 text-center text-xs text-slate-400">
+              No trading days logged. Add a day PnL above or click "Reset Simulator".
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = logs
+        .map((item, idx) => {
+          const pnlVal = Number(item.pnl) || 0;
+          const share = benchmarkUsd > 0 ? (pnlVal / benchmarkUsd) * 100 : 0;
+          const dayBreach = pnlVal > maxSingleDayUsd;
+          const safeLabel = String(item.label || `Day ${idx + 1}`).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+          return `
+            <tr data-day-id="${item.id}">
+              <td class="py-2 px-3 font-semibold whitespace-nowrap">${safeLabel}</td>
+              <td class="py-2 px-2.5 whitespace-nowrap">
+                <input
+                  type="number"
+                  step="any"
+                  value="${pnlVal}"
+                  aria-label="Edit ${safeLabel} PnL"
+                  onchange="updateSimDayPnl('${item.id}', this.value)"
+                  class="w-24 px-2 py-1 rounded-lg text-xs font-mono font-bold hc-input ${pnlVal >= 0 ? 'text-emerald-400' : 'text-rose-400'}"
+                />
+              </td>
+              <td class="py-2 px-2.5 font-mono whitespace-nowrap">${share.toFixed(1)}%</td>
+              <td class="py-2 px-2.5 whitespace-nowrap">
+                ${
+                  dayBreach
+                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-400/35">Breach</span>'
+                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/35">OK</span>'
+                }
+              </td>
+              <td class="py-2 px-2 text-right">
+                <button
+                  type="button"
+                  onclick="removeDayLog('${item.id}')"
+                  aria-label="Delete ${safeLabel}"
+                  class="px-2 py-0.5 rounded-lg text-xs font-bold text-rose-400 hover:bg-rose-500/15 cursor-pointer"
+                >
+                  ×
+                </button>
+              </td>
+            </tr>
+          `;
+        })
+        .join('');
+    }
+
+    // Initialize Application Safely
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        populateAssetSelects();
+        recalculateAll();
+      } catch (err) {
+        console.error('Calculator initialization error:', err);
+      }
+    });
   </script>
 </body>
 </html>
